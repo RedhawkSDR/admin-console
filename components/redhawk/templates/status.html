@@ -1,0 +1,14 @@
+<span ng-switch on="status.severity">
+    <span ng-switch-when="OK">
+        <span class="label label-success">{{status.severity}}</span>
+    </span>
+    <span ng-switch-when="WARNING">
+        <span class="label label-warning">{{status.severity}}</span>
+    </span>
+    <span ng-switch-when="ERROR">
+        <span class="label label-danger">{{status.severity}}</span>
+    </span>
+    <span ng-switch-default>
+        <span class="label label-default">{{status.severity}}</span>
+    </span>
+</span>

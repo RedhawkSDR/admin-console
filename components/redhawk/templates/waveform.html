@@ -1,0 +1,83 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      <b>{{waveform.name}}</b>
+      <status info="waveform.status"></status>
+      <small>{{waveform.identifier}}</small>
+      <small><json-source json-data="waveform"></json-source></small></h3>
+  </div>
+  <div class="panel-body">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-6 well">
+
+          <div class="row">
+            <div class="col-md-8">
+              <h4><span class="fa fa-power-off" ></span> Status  </h4>
+            </div>
+            <div class="col-md-4">
+
+              <start-status class="pull-right" info="waveform.started"></start-status>
+
+            </div>
+            <div class="col-md-12">
+
+              <div class="btn-toolbar">
+                <div class="btn-group">
+                  <button class="btn btn-default btn-lg" ng-if="!waveform.started" ng-click="waveform.start()"><span class="glyphicon glyphicon-play"></span></button>
+                  <button class="btn btn-default btn-lg" ng-if="waveform.started" ng-click="waveform.stop()"><span class="glyphicon glyphicon-stop"></span></button>
+                  <button class="btn btn-default btn-lg" ng-click="waveform.release()"><span class="glyphicon glyphicon-eject"></span></button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div>
+                <button class="btn btn-link btn-xs" ng-click="messages=[]"><small>Clear Messages</small></button>
+              </div>
+              <div ng-repeat="msg in messages" class="alert" ng-class="{'alert-danger': msg.is_warning, 'alert-info': !msg.is_warning}">
+                <small>{{msg.text}}</small>
+              </div>
+
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+
+              <div>
+                <h4><span class="glyphicon glyphicon-briefcase" ></span> Components</h4>
+                <ul class="list-group">
+                  <li ng-repeat="comp in waveform.components" class="list-group-item">
+                    <component id="comp.id" waveform-id="waveform.identifier" domain-id="domainId"></component>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4><span class="glyphicon glyphicon-bullhorn" ></span> Ports</h4>
+                <ul class="list-group">
+                  <li ng-repeat="port in waveform.ports" class="list-group-item">
+                    <a ng-if="port.canPlot" href="#plot/waveform/{{waveform.identifier}}/port/{{port.name}}/{{port.plotType}}">{{port.name}}</a>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+        <div class="col-md-6">
+
+          <div>
+            <properties info="waveform.properties" can-edit="true" configure="configure(properties)"></properties>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

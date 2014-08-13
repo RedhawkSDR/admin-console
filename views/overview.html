@@ -1,0 +1,63 @@
+<h2 ng-if="redhawk">Overview</h2>
+<div class="container" ng-if="redhawk">
+  <div class="row">
+    <div class="col-md-12">
+
+      <div>
+        <h4> <strong>{{redhawk.name}}</strong> <status info="redhawk.status"></status> <small>{{redhawk.identifier}} <json-source json-data="redhawk"></json-source></small></h4>
+      </div>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+
+      <properties info="redhawk.properties" can-edit="true" configure="configure(properties)"></properties>
+
+    </div>
+    <div class="col-md-6">
+
+      <div>
+        <h4>File System</h4>
+        <file-system domain-id="redhawk._restId"></file-system>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <small>Event Messages</small></button>
+        </div>
+        <div class="panel-body">
+          Subscribed Channels:
+          <div class="container">
+            <div ng-repeat="item in channels">
+              <h6>{{item}}</h6>
+            </div>
+          </div>
+        </div>
+        <table class="table table-striped table-condensed">
+          <tr>
+            <th>Topic Id</th>
+            <th>Producer Id</th>
+            <th>Source Category</th>
+            <th>Source Id</th>
+            <th>Source Name</th>
+          </tr>
+          <tr ng-if="messages" ng-repeat="msg in messages | reverse">
+            <td>{{msg.topic}}</td>
+            <td>{{msg.message.producerId}}</td>
+            <td>{{msg.message.sourceCategory.__value}}</td>
+            <td>{{msg.message.sourceId}}</td>
+            <td>{{msg.message.sourceName}}</td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>

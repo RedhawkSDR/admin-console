@@ -1,0 +1,36 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h5 class="panel-title"><strong><span class="glyphicon glyphicon-hdd" ></span> {{filesystem.cwd || '/'}}</strong><json-source json-data="filesystem"></json-source></h5>
+
+  </div>
+  <div class="list-group">
+    <a class="list-group-item" ng-click="loadFileSystem(filesystem.parent)">
+      <span class="glyphicon glyphicon-circle-arrow-left" ></span> Up
+    </a>
+    <div ng-repeat="item in filesystem.data.children track by $index" >
+      <a ng-if="item.directory" class="list-group-item"  ng-click="loadFileSystem(filesystem.cwd+'/'+item.name)">
+        <span class="glyphicon glyphicon-folder-open" ></span>
+        <small>{{item.name}}</small>
+      </a>
+      <div ng-if="!item.directory" class="dropdown">
+        <a  class="list-group-item"  id="dropdownMenu-{{$id}}" data-toggle="dropdown">
+          <span class="glyphicon glyphicon-file" ></span>
+          <small>{{item.name}}</small>
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu-{{$id}}">
+          <li role="presentation" ng-class="{'disabled': !item.canView}" >
+            <a role="menuitem" ng-click="fileViewer(filesystem.cwd+'/'+item.name)"><span class="fa fa-code"></span> File Viewer</a>
+          </li>
+          <li role="presentation" class="divider"></li>
+          <li role="presentation"><a role="menuitem" tabindex="-1" href="{{fileUrl(filesystem.cwd+'/'+item.name)}}">
+            <span class="glyphicon glyphicon-download"></span> Download</a>
+          </li>
+          <li role="presentation" ng-class="{'disabled': !item.canLaunch}">
+            <a role="menuitem" tabindex="-1" ng-click="launchWaveform(filesystem.cwd+'/'+item.name, item.launchName+'-'+$id)"><span class="fa fa-paper-plane"></span> Launch</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

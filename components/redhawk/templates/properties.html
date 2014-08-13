@@ -1,0 +1,90 @@
+<div ng-if="!compact">
+  <h4 ng-if="title === undefined ? true : title"><span class="fa fa-gears" ></span> Properties <json-source json-data="properties"></json-source></h4>
+  <div class="container-fluid" onload="this.tooltip()">
+    <form role="form" class="form-inline" ng-submit="submit()">
+
+        <table class="table table-striped table-condensed">
+          <tr>
+            <th>Label</th>
+            <th>Value</th>
+            </th>
+          </tr>
+          <tr ng-repeat="prop in properties | orderBy: 'name'" ng-class="{'text-muted': !prop.canEdit}">
+            <td  data-toggle="tooltip" data-placement="auto" title="{{prop.description.trim()}}">
+
+              <span>
+                {{prop.name}}
+                <span class="name" ng-if="!prop.name">{{prop.id}} (id)</span>
+                <span class="label label-default" ng-if="prop.definition.eobj_type == 'SimpleSequence'">Sequence</span>
+                <span class="label label-default" ng-if="prop.definition.eobj_type == 'Struct'">Struct</span>
+                <span class="label label-default" ng-if="prop.definition.eobj_type == 'StructSequence'">Struct Sequence</span>
+              </span>
+              <!--<span>-->
+                <!--<small><json-source json-data="prop"></json-source></small>-->
+              <!--</span>-->
+
+            </td>
+            <td>
+
+              <div ng-if="prop.canEdit && edit" class="form-group">
+
+                <select ng-if="prop.definition.type == 'boolean'" class="form-control" ng-model="form[prop.id]" ng-options="item.value as item.name for item in [{name: 'True', value: true},{name: 'False', value: false}]"></select>
+                <select ng-if="prop.definition.enumerations" class="form-control" ng-model="form[prop.id]" ng-options="item.value as item.label for item in prop.definition.enumerations.enumeration"></select>
+
+                <input ng-if="prop.definition.type != 'boolean' && !prop.definition.enumerations" type="text" class="form-control" ng-model="form[prop.id]" value="{{prop.value}}"/>
+                <span ng-if="prop.definition.units">{{prop.definition.units}}</span>
+              </div>
+
+              <div ng-if="!prop.canEdit || !edit">
+                <span class="value" ng-if="prop.definition.eobj_type == 'Simple'">{{prop.value}}</span>
+                <span ng-if="prop.definition.eobj_type == 'SimpleSequence'" ng-repeat="item in prop.values track by $index">{{item}} </span>
+                <span ng-if="prop.definition.eobj_type == 'Sequence'">
+                  <property info="prop"></property>
+                </span>
+                <div ng-if="prop.definition.eobj_type == 'Struct'">
+                  <property info="prop"></property>
+                </div>
+                <div ng-if="prop.definition.eobj_type == 'StructSequence'">
+                  <property info="prop"></property>
+                </div>
+                <span ng-if="prop.definition.units">{{prop.definition.units}}</span>
+              </div>
+
+            </td>
+          </tr>
+          <tr ng-if="canEdit">
+            <td colspan="2">
+              <button type="submit" class="btn btn-default" ng-if="edit">Configure</button>
+              <a class="btn btn-link" ng-click="toggleEdit()">
+                <i class="fa" ng-class="{'fa-unlock': edit, 'fa-lock': !edit}"></i>
+              </a>
+            </td>
+          </tr>
+        </table>
+    </form>
+
+  </div>
+</div>
+
+</div>
+<span ng-if="compact">
+  <button class="btn btn-sm btn-default" data-toggle="modal" data-target="#properties-{{$id}}">
+    <span class="fa fa-gears"></span>
+  </button>
+  <div class="modal fade" id="properties-{{$id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title"><span class="fa fa-gears"></span> Properties <small><json-window info="properties"></json-window></small></h4>
+        </div>
+        <div class="modal-body">
+          <properties info="properties" can-edit="canEdit" configure="configure({properties: properties})" title="false"></properties>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</span>

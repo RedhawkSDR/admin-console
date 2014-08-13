@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" ng-app="webSCA">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="images/RedHawk_Logo_ALT_B_121px.png"/>
+
+    <title>webSCA Explorer</title>
+
+    <!-- build:js lib/vendor.js -->
+    <script src="bower_components/jQuery/dist/jquery.js"></script>
+    <script src="bower_components/highlightjs/highlight.pack.js"></script>
+    <script src="bower_components/bootstrap-css/js/bootstrap.min.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/angular-recursion/angular-recursion.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-highlightjs/angular-highlightjs.js"></script>
+    <script src="bower_components/bootstrap-notify/js/bootstrap-notify.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:js js/app.js -->
+    <script src="components/redhawk/redhawk-config/redhawk-config-service.js"></script>
+    <script src="components/redhawk/redhawk-directives.js"></script>
+    <script src="components/redhawk/redhawk-notifications/redhawk-notifications.js"></script>
+    <script src="components/redhawk/redhawk-rest/redhawk-rest-service.js"></script>
+    <script src="components/redhawk/redhawk-services.js"></script>
+    <script src="components/subscription-socket/subscription-socket-service.js"></script>
+    <script src="components/websca/websca-directives.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/sigplot/sigplot-minimized.js"></script>
+    <script src="js/sigplot/sigplot.plugins-minimized.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:css lib/vendor.css -->
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="bower_components/highlightjs/styles/default.css">
+    <link rel="stylesheet" href="bower_components/bootstrap-css/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/bootstrap-notify/css/bootstrap-notify.css">
+    <!-- endbuild -->
+
+    <!-- build:css css/app.css -->
+    <link rel="stylesheet" href="css/site.css">
+    <!-- endbuild -->
+  </head>
+  <body ng-controller="UserSettings">
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+
+      <ul class="nav navbar-nav">
+        <li><a class="navbar-brand" href="#"><strong><img class="logo" src="images/RedHawk_Logo_ALT_B_121px.png"/> RHWEB</strong></a></li>
+        <li><a href="#">Overview</a></li>
+        <li class="divider"></li>
+        <li><a href="#/waveforms">Waveforms</a></li>
+        <li><a href="#/deviceManagers">Device Managers</a></li>
+      </ul>
+
+      <form class="navbar-form navbar-right" role="search">
+        <select ng-model="user.domain" ng-options="id for id in domains" class="form-control input-sm"></select>
+        <button class="btn btn-link" ng-click="addDomain()"><span class="glyphicon glyphicon-plus"></span></button>
+      </form>
+
+    </nav>
+
+    <div class="container" >
+
+      <div id="view" ng-if="user.domain" ng-view redhawk-notification></div>
+
+      <div id="errorNoDomain" ng-if="!user.domain" class="center-block text-center">
+        <div class="panel panel-info">
+          <div class="panel-body bg-info">
+            <h3>REDHAWK Domain List Empty</h3>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="container">
+      <div id="footer"></div>
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,67 @@
+<h2>Device Managers</h2>
+<div class="container">
+  <div class="row">
+    <div class="col-md-3">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Domain Managers
+        </div>
+
+        <ul class="list-group">
+          <a ng-repeat="item in redhawk.deviceManagers" ng-click="setManager(item.id)" ng-class="{'active': (setManager() == item.id) }" class="list-group-item">
+            <b>{{item.name}}</b>
+          </a>
+        </ul>
+
+        <div class="panel-footer">
+          <div class="text-right text-muted">
+            <small>{{redhawk.deviceManagers.length}} Device Managers</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-9">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">{{manager.label}} <status info="manager.status"></status> <small>{{manager.identifier}}</small><json-source json-data="manager"></json-source></h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="container-fluid">
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-12">
+
+                    <h4><span class="glyphicon glyphicon-tasks" ></span> Devices</h4>
+
+                  </div>
+                  <div class="col-md-12">
+
+                    <ul class="list-group">
+                      <li ng-repeat="(label, device) in manager.devices" class="list-group-item">
+                        <device id="device.id" manager-id="manager.identifier" domain-id="manager.domainId"></device>
+                      </li>
+                    </ul>
+
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+
+                <properties info="manager.properties" can-edit="false" configure="configure(properties)"></properties>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

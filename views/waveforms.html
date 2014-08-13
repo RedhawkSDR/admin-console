@@ -1,0 +1,40 @@
+<h2>Waveforms</h2>
+<div class="container">
+  <div class="row">
+    <div class="col-md-3">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-7">
+
+              <select ng-model="selectedWaveform" ng-options="item for item in waveforms" class="form-control"></select>
+
+            </div>
+            <div class="col-md-5">
+
+              <button class="btn btn-default btn-block" ng-click="launch(selectedWaveform)" ng-class="{'disabled': !selectedWaveform}">Launch</button>
+
+            </div>
+          </div>
+        </div>
+
+        <ul class="list-group">
+          <a ng-repeat="item in redhawk.waveforms" ng-click="setWaveform(item.id)" ng-class="{'active': (setWaveform() == item.id) }" class="list-group-item">
+            <b>{{item.name}}</b>
+          </a>
+        </ul>
+
+        <div class="panel-footer">
+          <div class="text-right text-muted">
+            <small>{{redhawk.waveforms.length}} Waveforms Running</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-9">
+      <waveform ng-if="setWaveform()" id="currentWaveform" domain-id="redhawk._restId"></waveform>
+    </div>
+  </div>
+</div>

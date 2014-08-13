@@ -1,0 +1,30 @@
+{
+  "name": "rhweb",
+  "version": "0.0.0",
+  "authors": [
+    "Rob Cannon <rob.cannon@axiosengineering.com>"
+  ],
+  "description": "A generic web interface to SCA",
+  "main": "index.html",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "font-awesome": "~4.1.0",
+    "highlightjs": "~8.0.0",
+    "bootstrap-css": "~3.1.1",
+    "angular": "~1.2.17",
+    "angular-bootstrap": "~0.11.0",
+    "angular-recursion": "~1.0.1",
+    "angular-route": "~1.2.17",
+    "angular-resource": "~1.2.17",
+    "angular-highlightjs": "~0.3.0",
+    "jQuery": "~2.1.1",
+    "bootstrap-notify": "robpc/bootstrap-notify#master"
+  }
+}
