@@ -4,7 +4,7 @@
 
           <h6 class="list-group-item-heading">
             <strong>{{component.name}}</strong><br/>
-            <small>{{component.identifier}}</small>
+            <small>{{component.id}}</small>
           </h6>
 
           <div>
@@ -21,7 +21,7 @@
               </button>
               <ul class="dropdown-menu" role="menu">
                 <li ng-repeat="port in component.ports">
-                  <a ng-if="port.canPlot" ng-class="{'disabled': !port.plotType}" href="#/plot/waveform/{{component.waveform.id}}/component/{{component.identifier}}/port/{{port.name}}/{{port.plotType}}">
+                  <a ng-if="port.canPlot" ng-class="{'disabled': !port.plotType}" href="#/plot/waveform/{{component.waveform.id}}/component/{{component.id}}/port/{{port.name}}/{{port.plotType}}">
                     {{port.name}}
                   </a>
                 </li>

@@ -34,7 +34,7 @@
 
     </div>
     <div class="col-md-9">
-      <waveform ng-if="setWaveform()" id="currentWaveform" domain-id="redhawk._restId"></waveform>
+      <waveform ng-show="redhawk.waveforms.length" id="currentWaveform" domain-id="redhawk._restId"></waveform>
     </div>
   </div>
 </div>

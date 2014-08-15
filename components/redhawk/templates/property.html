@@ -1,44 +1,33 @@
 
-<div ng-if="prop.definition.eobj_type == 'Simple'" class="well well-sm">
+<div ng-if="prop.scaType == 'simple'" class="well well-sm">
   <span class="name">{{prop.name}}:</span>
   <span class="name" ng-if="!prop.name">{{prop.id}} (id)</span>
   <span class="value" ng-class="{muted: !prop.canEdit}"> {{prop.value}}</span>
-  <span ng-if="prop.values" ng-repeat="item in prop.values track by $index">{{item}} </span>
+  <span ng-if="[prop.scaType == 'simpleSeq']" ng-repeat="item in prop.value track by $index">{{item}} </span>
 </div>
 
-<div ng-if="prop.definition.eobj_type == 'SimpleSequence'" class="well well-sm">
+<div ng-if="prop.scaType == 'simpleSeq'" class="well well-sm">
   <span class="name">{{prop.name}}:</span>
   <span class="name" ng-if="!prop.name">{{prop.id}} (id)</span>
   <span class="value" ng-class="{'text-muted': !prop.canEdit}"> {{prop.value}}</span>
-  <span ng-if="prop.definition.eobj_type == 'SimpleSequence'" ng-repeat="item in prop.values track by $index">{{item}} </span>
+  <span ng-if="prop.scaType == 'simpleSeq'" ng-repeat="item in prop.value track by $index">{{item}} </span>
 </div>
 
-<div ng-if="prop.definition.eobj_type == 'Struct'">
-  <accordion>
-    <accordion-group>
-      <accordion-heading>
-        <small>{{prop.name}} <span class="label label-default">Structure</span></small>
-      </accordion-heading>
-      <table class="table table-condensed">
-        <tr ng-repeat="simple in prop.simples">
-          <td class="name">{{simple.name}}</td>
-          <td class="value"> {{simple.value}}</td>
-        </tr>
-      </table>
-    </accordion-group>
-  </accordion>
+<div ng-if="prop.scaType == 'struct'">
+  <dl class="dl-horizontal">
+    <span ng-repeat="(k,v) in prop.value">
+      <dt>{{k}}</dt>
+      <dd>{{v}}</dd>
+    </span>
+  </dl>
 </div>
 
-<div ng-if="prop.definition.eobj_type == 'StructSequence'">
-  <accordion>
-    <accordion-group>
-      <accordion-heading>
-        <small>{{prop.name}} <span class="label label-default">Struct Sequence</span></small>
-      </accordion-heading>
-      <div ng-repeat="struct in prop.structs">
-        <property info="struct"></property>
-      </div>
-    </accordion-group>
-  </accordion>
+<div ng-if="prop.scaType == 'structSeq'">
+  <dl class="dl-horizontal" ng-repeat="struct in prop.value">
+    <span ng-repeat="(k,v) in struct">
+      <dt>{{k}}</dt>
+      <dd>{{v}}</dd>
+    </span>
+  </dl>
 </div>
 

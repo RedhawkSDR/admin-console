@@ -11,7 +11,7 @@ module.exports = function(grunt) {
     removeStyleLinkTypeAttributes: true
   };
 
-  var distDir = '../webapp';
+  var distDir = 'dist';
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),

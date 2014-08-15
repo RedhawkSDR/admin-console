@@ -10,9 +10,9 @@
     <div class="col-md-12">
 
       <h3>
-        <strong>{{device.label}}</strong> <status info="device.status"></status>
+        <strong>{{device.name}}</strong> <status info="device.status"></status>
         <div class="label label-default"><span ng-if="device.started">Started</span><span ng-if="!device.started">Stopped</span></div>
-        <small>{{device.identifier}}</small>
+        <small>{{device.id}}</small>
       </h3>
 
     </div>

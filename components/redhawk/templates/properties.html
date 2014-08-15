@@ -14,37 +14,34 @@
 
               <span>
                 {{prop.name}}
-                <span class="name" ng-if="!prop.name">{{prop.id}} (id)</span>
-                <span class="label label-default" ng-if="prop.definition.eobj_type == 'SimpleSequence'">Sequence</span>
-                <span class="label label-default" ng-if="prop.definition.eobj_type == 'Struct'">Struct</span>
-                <span class="label label-default" ng-if="prop.definition.eobj_type == 'StructSequence'">Struct Sequence</span>
+                <span class="name" ng-if="!prop.name">{{prop.id}}</span>
+                <span class="label label-default" ng-if="prop.scaType == 'simpleSeq'">Sequence</span>
+                <span class="label label-default" ng-if="prop.scaType == 'struct'">Struct</span>
+                <span class="label label-default" ng-if="prop.scaType == 'structSeq'">Struct Sequence</span>
               </span>
-              <!--<span>-->
-                <!--<small><json-source json-data="prop"></json-source></small>-->
-              <!--</span>-->
 
             </td>
             <td>
 
               <div ng-if="prop.canEdit && edit" class="form-group">
 
-                <select ng-if="prop.definition.type == 'boolean'" class="form-control" ng-model="form[prop.id]" ng-options="item.value as item.name for item in [{name: 'True', value: true},{name: 'False', value: false}]"></select>
-                <select ng-if="prop.definition.enumerations" class="form-control" ng-model="form[prop.id]" ng-options="item.value as item.label for item in prop.definition.enumerations.enumeration"></select>
+                <select ng-if="prop.type == 'boolean'" class="form-control" ng-model="form[prop.id]" ng-options="item.value as item.name for item in [{name: 'True', value: true},{name: 'False', value: false}]"></select>
+                <select ng-if="prop.enumerations" class="form-control" ng-model="form[prop.id]" ng-options="value as label for (label, value) in prop.enumerations"></select>
 
-                <input ng-if="prop.definition.type != 'boolean' && !prop.definition.enumerations" type="text" class="form-control" ng-model="form[prop.id]" value="{{prop.value}}"/>
+                <input ng-if="prop.type != 'boolean' && !prop.enumerations" type="text" class="form-control" ng-model="form[prop.id]" value="{{prop.value}}"/>
                 <span ng-if="prop.definition.units">{{prop.definition.units}}</span>
               </div>
 
               <div ng-if="!prop.canEdit || !edit">
-                <span class="value" ng-if="prop.definition.eobj_type == 'Simple'">{{prop.value}}</span>
-                <span ng-if="prop.definition.eobj_type == 'SimpleSequence'" ng-repeat="item in prop.values track by $index">{{item}} </span>
-                <span ng-if="prop.definition.eobj_type == 'Sequence'">
+                <span class="value" ng-if="prop.scaType == 'simple'">{{prop.value}}</span>
+                <span ng-if="prop.scaType == 'simpleSeq'" ng-repeat="item in prop.value track by $index">{{item}} </span>
+                <span ng-if="prop.scaType == 'sequence'">
                   <property info="prop"></property>
                 </span>
-                <div ng-if="prop.definition.eobj_type == 'Struct'">
+                <div ng-if="prop.scaType == 'struct'">
                   <property info="prop"></property>
                 </div>
-                <div ng-if="prop.definition.eobj_type == 'StructSequence'">
+                <div ng-if="prop.scaType == 'structSeq'">
                   <property info="prop"></property>
                 </div>
                 <span ng-if="prop.definition.units">{{prop.definition.units}}</span>

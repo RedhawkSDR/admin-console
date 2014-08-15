@@ -26,7 +26,7 @@
 
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">{{manager.label}} <status info="manager.status"></status> <small>{{manager.identifier}}</small><json-source json-data="manager"></json-source></h3>
+          <h3 class="panel-title">{{manager.name}} <status info="manager.status"></status> <small>{{manager.id}}</small><json-source json-data="manager"></json-source></h3>
         </div>
         <div class="panel-body">
 
@@ -44,7 +44,7 @@
 
                     <ul class="list-group">
                       <li ng-repeat="(label, device) in manager.devices" class="list-group-item">
-                        <device id="device.id" manager-id="manager.identifier" domain-id="manager.domainId"></device>
+                        <device id="device.id" manager-id="manager.id" domain-id="manager.domainId"></device>
                       </li>
                     </ul>
 

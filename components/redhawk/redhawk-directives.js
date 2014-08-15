@@ -12,8 +12,8 @@ angular.module('redhawkDirectives', ['RecursionHelper', 'webSCAServices', 'ui.bo
               angular.forEach(scope.properties, function (prop) {
 
                 prop.canEdit = false;
-                if(prop.definition && prop.definition.eobj_type == 'Simple')
-                  prop.canEdit = prop.mode != 'readonly' && prop.definition.kind.indexOf('configure') > -1;
+                if(prop.scaType == 'simple')
+                  prop.canEdit = prop.mode != 'readonly' && prop.kinds.indexOf('configure') > -1;
 
                 if(prop.canEdit) {
                   scope.form[prop.id] = prop.value;

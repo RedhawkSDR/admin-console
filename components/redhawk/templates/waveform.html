@@ -3,7 +3,7 @@
     <h3 class="panel-title">
       <b>{{waveform.name}}</b>
       <status info="waveform.status"></status>
-      <small>{{waveform.identifier}}</small>
+      <small>{{waveform.id}}</small>
       <small><json-source json-data="waveform"></json-source></small></h3>
   </div>
   <div class="panel-body">
@@ -51,7 +51,7 @@
                 <h4><span class="glyphicon glyphicon-briefcase" ></span> Components</h4>
                 <ul class="list-group">
                   <li ng-repeat="comp in waveform.components" class="list-group-item">
-                    <component id="comp.id" waveform-id="waveform.identifier" domain-id="domainId"></component>
+                    <component id="comp.id" waveform-id="waveform.id" domain-id="domainId"></component>
                   </li>
                 </ul>
               </div>
@@ -60,7 +60,7 @@
                 <h4><span class="glyphicon glyphicon-bullhorn" ></span> Ports</h4>
                 <ul class="list-group">
                   <li ng-repeat="port in waveform.ports" class="list-group-item">
-                    <a ng-if="port.canPlot" href="#plot/waveform/{{waveform.identifier}}/port/{{port.name}}/{{port.plotType}}">{{port.name}}</a>
+                    <a ng-if="port.canPlot" href="#plot/waveform/{{waveform.id}}/port/{{port.name}}/{{port.plotType}}">{{port.name}}</a>
                   </li>
                 </ul>
               </div>

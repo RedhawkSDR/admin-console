@@ -20,8 +20,18 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
       };
 
       redhawk.getDomainIds = function(){
-        if(!redhawk.domainIds)
-          redhawk.domainIds = RedhawkREST.domain.query();
+        if(!redhawk.domainIds) {
+          redhawk.domainIds = [];
+
+          redhawk.domainIds.$promise = RedhawkREST.domain.query().$promise.then(function(data){
+            var domains = data['domains'];
+            angular.forEach(domains, function(item){
+              this.push(item);
+            }, redhawk.domainIds);
+            return redhawk.domainIds;
+          });
+        }
+
         return redhawk.domainIds;
       };
       redhawk.addDomain = function(id, name, uri) {
@@ -57,13 +67,14 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
         return $.makeArray(arguments).join("::");
       };
 
-      var portDataTypeRegex = /^IDL\:BULKIO\/data(.*)\:(.*)$/;
+      var portDataTypeRegex = /^data(.*)$/;
       var processPorts = function(ports) {
         angular.forEach(ports, function(port) {
-          var matches = portDataTypeRegex.exec(port.repid);
+          var matches = portDataTypeRegex.exec(port.type);
           if(matches) {
-            port.canPlot = port.eobj_type == "ScaUsesPort";
-            port.plotType = matches[1].toLowerCase();
+            port.canPlot = port.direction == "Uses" && port.namespace == "BULKIO";
+            if(port.canPlot)
+              port.plotType = matches[1].toLowerCase();
           } else {
             port.canPlot = false;
             console.log("DEBUG: " + port + " port has unrecognized repid: " + port.repid);
@@ -151,49 +162,26 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
         };
 
         self.getLaunchableWaveforms = function() {
-          var defer = $q.defer();
+          if(!redhawk.availableWaveforms) {
+            redhawk.availableWaveforms = [];
+            redhawk.availableWaveforms.$promise =
+                RedhawkREST.waveform.status({domainId: self._restId}).$promise.then(function(data){
+                  angular.forEach(data['available'], function(item){
+                    this.push(item['name']);
+                  },redhawk.availableWaveforms);
 
-          var fs = self.getFileSystem('/waveforms');
-          fs.$promise.then(function(data){
-            var waveforms = [];
-            angular.forEach(data.children, function(child){
-              this.push(child.name);
-            }, waveforms);
-            defer.resolve(waveforms);
-          });
-
-          return defer.promise
-        };
-        self.launch = function(path, id) {
-          var defer = $q.defer();
-
-          var name = "";
-          if(!/\.xml$/.test(path)) {
-            name = path;
-            path = '/waveforms/'+path+'/'+path+'.sad.xml';
-          } else {
-            name = (path.substring(path.lastIndexOf('/')+1)).replace('.sad.xml','');
+                  return redhawk.availableWaveforms;
+                }
+            );
           }
 
-          if(!id) id = name + '-' + genId();
-
-          self.getFileSystem(path).$promise.then(
-              function(data){
-                console.log("Launching "+path);
-                RedhawkREST.waveform.launch({domainId: self._restId}, {path: path, name: id}, function(data){
-                  defer.resolve(data);
-                  notify.success("Waveform "+path+" launched ("+id+").")
-                },function(data){
-                  notify.error("Waveform "+name+" launched ("+id+"). "+JSON.stringify(data));
-                });
-              }, function(data) {
-                var msg = "Waveform file path '"+path+"' not found";
-                defer.reject(msg);
-                notify.error(msg)
-              }
-          );
-
-          return defer.promise;
+          return redhawk.availableWaveforms
+        };
+        self.launch = function(name) {
+          return RedhawkREST.waveform.launch({domainId: self._restId}, {name: name}, function(data){
+            notify.success("Waveform "+data['launched']+" launched");
+            self._reload();
+          });
         };
 
         self._load(id);
@@ -265,31 +253,34 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
             notify.error("Waveform "+id+" returned "+data.status);
           }).$promise;
         };
-        self._reload = function() { self._load(self.identifier, self.domainId); };
+        self._reload = function() { self._load(self.id, self.domainId); };
 
         self.start = function() {
           return RedhawkREST.waveform.start(
-            {id: self.identifier, domainId: self.domainId},{},
-            function(){notify.success("Waveform "+self.identifier+" started.")},
-            function(){notify.error("Waveform "+self.identifier+" failed to start.")}
+            {id: self.id, domainId: self.domainId},{},
+            function(){notify.success("Waveform "+self.name+" started.")},
+            function(){notify.error("Waveform "+self.name+" failed to start.")}
           );
         };
         self.stop = function() {
           return RedhawkREST.waveform.stop(
-            {id: self.identifier, domainId: self.domainId},{},
-            function(){notify.success("Waveform "+self.identifier+" stopped.");},
-            function(){notify.error("Waveform "+self.identifier+" failed to stop.");}
+            {id: self.id, domainId: self.domainId},{},
+            function(){notify.success("Waveform "+self.name+" stopped.");},
+            function(){notify.error("Waveform "+self.name+" failed to stop.");}
           );
         };
         self.release = function() {
           return RedhawkREST.waveform.release(
-            {id: self.identifier, domainId: self.domainId},{},
-            function(){notify.success("Waveform "+self.identifier+" released.");},
-            function(){notify.error("Waveform "+self.identifier+" failed to release.");
+            {id: self.id, domainId: self.domainId},{},
+            function(){
+              notify.success("Waveform "+self.name+" released.");
+              redhawk.getDomain(self.domainId)._reload();
+            },
+            function(){notify.error("Waveform "+self.name+" failed to release.");
           });
         };
         self.configure = function(properties) {
-          return RedhawkREST.waveform.configure({id: self.identifier, domainId: self.domainId}, {properties: properties});
+          return RedhawkREST.waveform.configure({id: self.id, domainId: self.domainId}, {properties: properties});
         };
 
         self._load(id, domainId);
@@ -315,10 +306,14 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
             notify.error("Component "+id+" returned "+data.status);
           }).$promise;
         };
-        self._reload = function() { self._load(self.identifier, self.domainId, self.waveform.id); };
+        self._reload = function() { self._load(self.id, self.domainId, self.waveform.id); };
 
         self.configure = function(properties) {
-          return RedhawkREST.component.configure({componentId: self.identifier, waveformId: self.waveform.id, domainId: self.domainId, properties: properties});
+          return RedhawkREST.component.configure(
+              {componentId: self.id, waveformId: self.waveform.id, domainId: self.domainId},
+              {properties: properties},
+              function(){ self._reload(); }
+          );
         };
 
         self._load(id, domainId, waveformId);
@@ -343,10 +338,14 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
             notify.error("Device "+id+" returned "+data.status);
           }).$promise;
         };
-        self._reload = function() { self._load(self.identifier, self.domainId, self.deviceManager.id); };
+        self._reload = function() { self._load(self.id, self.domainId, self.deviceManager.id); };
 
         self.configure = function(properties) {
-          return RedhawkREST.device.configure({deviceId: self.identifier, managerId: self.deviceManager.id, domainId: self.domainId, properties: properties});
+          return RedhawkREST.device.configure(
+              {deviceId: self.id, managerId: self.deviceManager.id, domainId: self.domainId},
+              {properties: properties},
+              function(){ self._reload(); }
+          );
         };
 
         self._load(id, domainId, managerId);
@@ -370,10 +369,14 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
             notify.error("Device Manager "+id+" returned "+data.status);
           }).$promise;
         };
-        self._reload = function() { self._load(self.identifier, self.domainId); };
+        self._reload = function() { self._load(self.id, self.domainId); };
 
         self.configure = function(properties) {
-          return RedhawkREST.component.configure({id: self.identifier, domainId: self.domainId, properties: properties});
+          return RedhawkREST.component.configure(
+              {id: self.id, domainId: self.domainId},
+              {properties: properties},
+              function(){ self._reload(); }
+          );
         };
 
         self._load(id, domainId);

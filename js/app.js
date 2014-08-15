@@ -128,11 +128,14 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
     $scope.$watch('user.domain', function(domainId) {
       $scope.redhawk = RedhawkDomain.getDomain(domainId);
 
-      $scope.redhawk.getLaunchableWaveforms().then(function(waveforms){
-        $scope.waveforms = waveforms;
-      });
+      $scope.waveforms = $scope.redhawk.getLaunchableWaveforms();
 
       $scope.currentWaveform = null;
+    });
+
+    $scope.$watch('redhawk.waveforms', function(waveforms){
+      if(waveforms.length)
+        $scope.setWaveform(waveforms[0].id);
     });
 
     $scope.setWaveform = function(id) {
@@ -142,12 +145,9 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
     };
 
     $scope.launch = function(name) {
-      $scope.redhawk.launch(name).then(function(waveform){
-        console.log(waveform);
-        //$scope.setWaveform(waveform.identifier);
-        $scope.redhawk._reload();
+      $scope.redhawk.launch(name).$promise.then(function(waveform){
         $scope.redhawk.$promise.then(function(){
-          $scope.setWaveform(waveform.identifier);
+          $scope.setWaveform(waveform.id);
         });
       })
     };
