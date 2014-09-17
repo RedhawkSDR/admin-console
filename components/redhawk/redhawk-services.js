@@ -253,19 +253,42 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
             notify.error("Waveform "+id+" returned "+data.status);
           }).$promise;
         };
-        self._reload = function() { self._load(self.id, self.domainId); };
+        self._reload = function() {
+          self._load(self.id, self.domainId);
+          self.$promise.then(function(wf){
+            angular.forEach(wf.components,
+              function(comp){
+                var obj = redhawk.getDomain(self.domainId).getComponent(comp.id, self.id);
+                // Calling obj after the fact to make the obj has been intiated
+                obj.$promise.then(
+                  function(){
+                    // calling the parent ref instead of the function param since the
+                    // promise resolves to the rest data not the obj.
+                    obj._reload();
+                  }
+                );
+              }
+            )
+          });
+        };
 
         self.start = function() {
-          return RedhawkREST.waveform.start(
-            {id: self.id, domainId: self.domainId},{},
-            function(){notify.success("Waveform "+self.name+" started.")},
+          return RedhawkREST.waveform.update(
+            {id: self.id, domainId: domainId}, {started: true},
+            function(){
+              notify.success("Waveform "+self.name+" started.");
+              self._reload();
+            },
             function(){notify.error("Waveform "+self.name+" failed to start.")}
           );
         };
         self.stop = function() {
-          return RedhawkREST.waveform.stop(
-            {id: self.id, domainId: self.domainId},{},
-            function(){notify.success("Waveform "+self.name+" stopped.");},
+          return RedhawkREST.waveform.update(
+            {id: self.id, domainId: domainId},{started: false},
+            function(){
+              notify.success("Waveform "+self.name+" stopped.");
+              self._reload();
+            },
             function(){notify.error("Waveform "+self.name+" failed to stop.");}
           );
         };
@@ -558,7 +581,7 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
       RedhawkSocket.port = function(options, on_data, on_sri) {
         var portSocket = SubscriptionSocket.createNew();
 
-        var url = RedhawkConfig.websocketUrl + '/bulkio';
+        var url = RedhawkConfig.websocketUrl;
 
         if(options.domain)
           url += '/domains/'+options.domain;
@@ -568,6 +591,8 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
           url += '/components/'+options.component;
         if(options.port)
           url += '/ports/'+options.port;
+
+        url += '/bulkio';
 
         if(on_data)
           portSocket.addBinaryListener(on_data);

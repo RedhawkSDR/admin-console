@@ -68,37 +68,6 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
     function($scope, $modal, user, $timeout, RedhawkDomain){
       $scope.user = user;
       $scope.domains = RedhawkDomain.getDomainIds();
-      $scope.domains.$promise.then(function(data){
-        if(data.length == 0) {
-          $scope.addDomain();
-        }
-      });
-
-      $scope.addDomain = function() {
-        $modal.open({
-          templateUrl: 'components/websca/templates/add-domain.html',
-          controller: function ($scope, $modalInstance) {
-            $scope.id = 'REDHAWK_DEV';
-            $scope.name = 'REDHAWK_DEV';
-            $scope.uri = 'localhost';
-
-            $scope.add = function(id, name, uri){
-              RedhawkDomain.addDomain(id,name,uri).then(function(){
-                //The properties don't load immediately on the
-                // back end, so this mitigates the issue.
-                $timeout(function(){
-                  user.domain = id;
-                }, 2000);
-              });
-              $modalInstance.close();
-            };
-            $scope.close = function() {
-              $modalInstance.close();
-            }
-          },
-          size: 'sm'
-        });
-      };
     }
   ])
   .controller('Overview', ['$scope', 'RedhawkSocket',  'RedhawkDomain', 'user',

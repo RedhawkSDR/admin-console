@@ -64,7 +64,7 @@
         <li><p class="navbar-text">&nbsp;</p></li>
       </ul>
       <form class="navbar-form navbar-right" role="search">
-        <select ng-model="user.domain" ng-options="id for id in domains" class="form-control input-sm"></select>
+        <select ng-if="domains" ng-model="user.domain" ng-options="id for id in domains" class="form-control input-sm"></select>
         <!--<button class="btn btn-link" ng-click="addDomain()"><span class="glyphicon glyphicon-plus"></span></button>-->
       </form>
 

@@ -13,7 +13,7 @@ angular.module('RedhawkConfig', [])
     };
 
     this.restPath = '/rh/rest';
-    this.wsPath = '/rh/ws';
+    this.wsPath = '/rh/rest';
     this.websocketUrl = getWSBasePath() + this.wsPath;
     this.restUrl = this.restPath;
 

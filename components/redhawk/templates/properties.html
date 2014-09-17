@@ -7,7 +7,6 @@
           <tr>
             <th>Label</th>
             <th>Value</th>
-            </th>
           </tr>
           <tr ng-repeat="prop in properties | orderBy: 'name'" ng-class="{'text-muted': !prop.canEdit}">
             <td  data-toggle="tooltip" data-placement="auto" title="{{prop.description.trim()}}">
@@ -25,7 +24,10 @@
 
               <div ng-if="prop.canEdit && edit" class="form-group">
 
-                <select ng-if="prop.type == 'boolean'" class="form-control" ng-model="form[prop.id]" ng-options="item.value as item.name for item in [{name: 'True', value: true},{name: 'False', value: false}]"></select>
+                <select ng-if="prop.type == 'boolean'"
+                        class="form-control"
+                        ng-model="form[prop.id]" ng-options="o.value as o.name for o in booleanSelectOptions">
+                </select>
                 <select ng-if="prop.enumerations" class="form-control" ng-model="form[prop.id]" ng-options="value as label for (label, value) in prop.enumerations"></select>
 
                 <input ng-if="prop.type != 'boolean' && !prop.enumerations" type="text" class="form-control" ng-model="form[prop.id]" value="{{prop.value}}"/>
@@ -73,7 +75,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title"><span class="fa fa-gears"></span> Properties <small><json-window info="properties"></json-window></small></h4>
+          <h4 class="modal-title"><span class="fa fa-gears"></span> Properties <small><json-source json-data="properties"></json-source></small></h4>
         </div>
         <div class="modal-body">
           <properties info="properties" can-edit="canEdit" configure="configure({properties: properties})" title="false"></properties>

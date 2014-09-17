@@ -21,12 +21,11 @@ angular.module('RedhawkREST', ['ngResource', 'RedhawkConfig'])
       status:    {method: 'GET',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms'},
       launch:    {method: 'POST',   url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms'},
       release:   {method: 'DELETE', url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id'},
-      start:     {method: 'PUT',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id/start'},
-      stop:      {method: 'PUT',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id/stop'},
-      configure: {method: 'PUT',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id/configure'}
+      update:    {method: 'POST',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id'},
+      configure: {method: 'PUT',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id/properties'}
     });
     this.component = $resource(RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:waveformId/components/:componentId', {}, {
       query: {method: 'GET'},
-      configure: {method: 'PUT', url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:waveformId/components/:componentId/configure'}
+      configure: {method: 'PUT', url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:waveformId/components/:componentId/properties'}
     });
   }]);

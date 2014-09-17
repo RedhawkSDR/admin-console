@@ -38,6 +38,8 @@ angular.module('redhawkDirectives', ['RecursionHelper', 'webSCAServices', 'ui.bo
         templateUrl: 'components/redhawk/templates/properties.html',
         compile: PropertyProcessorService.compile,
         controller: function($scope) {
+          $scope.booleanSelectOptions = [{ name: 'True', value: true }, { name: 'False', value: false }];
+
           $scope.toggleEdit = function() {
             $scope.edit = !$scope.edit;
 
