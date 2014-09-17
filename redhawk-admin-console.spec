@@ -38,6 +38,7 @@ Requires:       redhawk >= 1.10
 Requires:       redhawk-web
 Requires:       redhawk-rest-python
 BuildRequires:  npm
+BuildRequires:  git
 
 
 %description
