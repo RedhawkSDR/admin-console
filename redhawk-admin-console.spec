@@ -21,6 +21,9 @@
 %define _client %{_prefix}/admin-console
 %define _nginx /etc/nginx/conf.d/redhawk-sites
 
+%define bower node_modules/bower/bin/bower
+%define grunt node_modules/grunt-cli/bin/grunt
+
 Prefix:         %{_prefix}
 Name:		redhawk-admin-console
 Version:	0.1
@@ -34,6 +37,8 @@ Source0:        %{name}-%{version}.tar.gz
 Requires:       redhawk >= 1.10
 Requires:       redhawk-web
 Requires:       redhawk-rest-python
+BuildRequires:  npm
+
 
 %description
 %{summary}
@@ -46,7 +51,9 @@ Requires:       redhawk-rest-python
 %build
 
 %install
-grunt dist
+npm install
+%{bower} install
+%{grunt} dist
 
 mkdir -p $RPM_BUILD_ROOT%{_prefix}
 cp -R dist $RPM_BUILD_ROOT%{_client}
