@@ -162,196 +162,254 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
   .controller('Plot', ['$scope', '$routeParams', 'RedhawkSocket', 'user',
     function($scope, $routeParams, RedhawkSocket, user){
 
-    $scope.waveformId = $routeParams.waveformId;
-    $scope.componentId = $routeParams.componentId;
-    $scope.name = $routeParams.portName;
+      $scope.waveformId = $routeParams.waveformId;
+      $scope.componentId = $routeParams.componentId;
+      $scope.name = $routeParams.portName;
 
-    var dataType = $routeParams.dataType ? $routeParams.dataType : 'double';
+      var dataType = $routeParams.dataType ? $routeParams.dataType : 'float';
 
-    var defaultSettings = {
-      xdelta: 0.0002,
-      xstart: 0,
-      xunits: 1,
-      ydelta : 1,
-      ystart: 0,
-      yunits: 11,
-      size: 1,
-      subsize: 1000
-    };
-    $scope.plotSettings = angular.copy(defaultSettings);
-
-    $scope.useSRISettings = true;
-    $scope.customSettings = angular.copy(defaultSettings);
-
-    $scope.$watch('useSRISettings', function(value) {
-      if(value) {
-        $scope.customSettings = angular.copy($scope.plotSettings);
-        setPlots($scope.plotSettings);
-      }
-    });
-
-    var plot =  new sigplot.Plot(document.getElementById("plot"), {
-      all: true,
-      expand: true,
-      autohide_panbars: true,
-      gridBackground: ["rgba(255,255,255,1", "rgba(200,200,200,1"],
-      xi: true,
-      fillStyle: ["rgba(224, 255, 194, 0.0)", "rgba(0, 153, 51, 0.7)", "rgba(0, 0, 0, 1.0)"]
-    });
-    var layer = plot.overlay_array(null, defaultSettings);
-
-    var raster =  new sigplot.Plot(document.getElementById("raster"), {
-      all: true,
-      expand: true,
-      autol: 100,
-      autohide_panbars: true,
-      colors: {bg: "rgba(255,255,255,1)", fg: "rgba(0,0,0,1)"}
-    });
-    var layer2 = raster.overlay_pipe(angular.extend({type : 2000}, defaultSettings));
-
-    raster.mimic(plot, {xzoom: true, unzoom: true});
-
-    var setLayer = function(layer, settings) {
-      var newSettings = angular.copy(settings);
-
-      layer.xstart = newSettings['xstart'];
-      layer.xdelta = newSettings['xdelta'];
-      layer.ystart = newSettings['ystart'];
-      layer.ydelta = newSettings['ydelta'];
-      layer.xlab   = newSettings['xunits'];
-      layer.ylab   = newSettings['yunits'];
-    };
-
-    var setPlots = function(settings) {
-      if(settings['yunits'] == 0)
-        settings['yunits'] = 11;
-
-      var plotLayer = plot.get_layer(layer);
-      plotLayer.hcb.size = settings['size'];
-      setLayer( plotLayer, settings );
-
-      var rasterLayer = raster.get_layer(layer2);
-      rasterLayer.hcb.subsize = settings['subsize'];
-      setLayer( rasterLayer, settings );
-    };
-
-    $scope.updateCustomSettings = function() {
-      if(!$scope.useSRISettings) {
-        setPlots($scope.customSettings);
-      }
-    };
-
-    var getDataConverter = (function(){
-      /*
-       Create a map to convert the standard REDHAWK BulkIO Formats
-       into Javascript equivalents.
-       ----
-       byte      = 8-bit signed
-       char      = 8-bit unsigned
-       octet     = 8-bit The signed-ness is undefined
-       short     = 16-bit signed integer
-       ushort    = 16-bit unsigned integer
-       long      = 32-bit signed integer
-       ulong     = 32-bit unsigned integer
-       longlong  = 64-bit signed integer
-       ulonglong = 64-bit unsigned integer
-       float     = 32-bit floating point
-       double    = 64-bit floating point
-       ----
-       */
-      var conversionMap = {
-        byte: Int8Array,
-        char: Uint8Array,
-        octet: Uint8Array,
-        ushort: Uint16Array,
-        short: Int16Array,
-        long: Int32Array,
-        ulong: Uint32Array,
-        longlong: undefined, //This should be 64-bit
-        ulonglong: undefined, //This should be 64-bit
-        float: Float32Array,
-        double: Float64Array
+      var defaultSettings = {
+        xdelta:10.25390625,
+        xstart: 0,
+        xunits: 1,
+        ydelta : 0.09752380952380953,
+        ystart: 0,
+        yunits: 3,
+        subsize: 16385,
+        size: 1,
+        format: 'SF'
       };
-      var defaultConversion = Float32Array;
+      $scope.plotSettings = angular.copy(defaultSettings);
 
-      return function(type) {
-        var fn = conversionMap[type];
-        console.log("Requesting dataconverter for type '"+type+"'."+fn);
+      $scope.useSRISettings = true;
+      $scope.customSettings = angular.copy(defaultSettings);
 
-        if(type == 'octet')
-          console.log("Plot::DataConverter::WARNING - Data type is 'octet' assuming unsigned.");
-
-        if(!fn) {
-          console.log("Plot::DataConverter::WARNING - Data type is '"+type+"' using default.");
-          fn = defaultConversion;
-        }
-
-        return function(data) { return new fn(data); };
-      };
-    })();
-    var dataConverter = getDataConverter(dataType);
-
-    var lastDataSize = 1000;
-    var on_data = function(data){
-      var array = dataConverter(data);
-
-      lastDataSize = array.length;
-
-      plot.reload(layer, array );
-      raster.push(layer2, array );
-    };
-
-    var updatePlotSettings = function(data) {
-      var isDirty = false;
-      angular.forEach(data, function(item, key){
-        if(angular.isDefined($scope.plotSettings[key]) && !angular.equals($scope.plotSettings[key], item)) {
-          isDirty = true;
-          console.log("Plot settings change "+key+": "+$scope.plotSettings[key]+" -> "+item);
-          $scope.plotSettings[key] = item;
+      $scope.$watch('useSRISettings', function(value) {
+        if(plot && raster && value) {
+          $scope.customSettings = angular.copy($scope.plotSettings);
+          setPlots($scope.plotSettings);
         }
       });
 
-      $scope.plotSettings['size'] = lastDataSize * $scope.plotSettings['xdelta'];
-      if(data['subsize'] == 0) {
-        $scope.plotSettings['subsize'] = lastDataSize;
-      }
+      var plot, raster, layer, layer2;
 
-      if(isDirty && $scope.useSRISettings) {
-        setPlots($scope.plotSettings);
+      var createPlot = function(format, settings) {
 
-        $scope.customSettings = angular.copy($scope.plotSettings);
-      }
-    };
+        plot = new sigplot.Plot(document.getElementById("plot"), {
+          //all: true,
+          //expand: true,
+          autohide_panbars: true,
+          autox: 3,
+          gridBackground: ["rgba(255,255,255,1", "rgba(200,200,200,1"],
+          xi: true,
+          fillStyle: ["rgba(224, 255, 194, 0.0)", "rgba(0, 153, 51, 0.7)", "rgba(0, 0, 0, 1.0)"]
+        });
+        layer = plot.overlay_array(null, angular.extend(settings, {'format': format}));
+      };
 
-    var sriData = {};
-    var on_sri = function(sri) {
-      updatePlotSettings(sri);
+      var createRaster = function(format, settings) {
+        raster = new sigplot.Plot(document.getElementById("raster"), {
+          all: true,
+          expand: true,
+          autol: 100,
+          autox: 3,
+          autohide_panbars: true,
+          colors: {bg: "rgba(255,255,255,1)", fg: "rgba(0,0,0,1)"}
+        });
+        layer2 = raster.overlay_pipe(angular.extend(settings, {type: 2000, 'format': format, pipe: true, pipesize: 1024 * 1024 * 5}));
+      };
 
-      angular.forEach(sri, function(value, key){
-        if(angular.isArray(value)) {
-          sriData[key] = value.join(", ");
-        } else if(angular.isObject(value)) {
-          var str = [];
-          angular.forEach(value, function(value, key) {
-            str.push(key+": "+value);
+      var setLayer = function(layer, settings) {
+        var newSettings = angular.copy(settings);
+
+        layer.xstart = newSettings['xstart'];
+        layer.xdelta = newSettings['xdelta'];
+        layer.ystart = newSettings['ystart'];
+        layer.ydelta = newSettings['ydelta'];
+        layer.xlab   = newSettings['xunits'];
+        layer.ylab   = newSettings['yunits'];
+        layer.subsize = newSettings['subsize'];
+        layer.size   = newSettings['size'];
+        layer.mode   = newSettings['mode'];
+      };
+
+      var setPlots = function(settings) {
+        if(settings['yunits'] == 0)
+          settings['yunits'] = 11;
+
+        var plotLayer = plot.get_layer(layer);
+        plotLayer.hcb.size = settings['size'];
+        setLayer( plotLayer, settings );
+
+        var rasterLayer = raster.get_layer(layer2);
+        rasterLayer.hcb.subsize = settings['subsize'];
+        setLayer( rasterLayer, settings );
+      };
+
+      $scope.updateCustomSettings = function() {
+        if(!$scope.useSRISettings) {
+          setPlots($scope.customSettings);
+        }
+      };
+
+      var getDataConverter = (function(){
+        /*
+         Create a map to convert the standard REDHAWK BulkIO Formats
+         into Javascript equivalents.
+         ----
+         byte      = 8-bit signed
+         char      = 8-bit unsigned
+         octet     = 8-bit The signed-ness is undefined
+         short     = 16-bit signed integer
+         ushort    = 16-bit unsigned integer
+         long      = 32-bit signed integer
+         ulong     = 32-bit unsigned integer
+         longlong  = 64-bit signed integer
+         ulonglong = 64-bit unsigned integer
+         float     = 32-bit floating point
+         double    = 64-bit floating point
+         ----
+         */
+        var conversionMap = {
+          byte: Int8Array,
+          char: Uint8Array,
+          octet: Uint8Array,
+          ushort: Uint16Array,
+          short: Int16Array,
+          long: Int32Array,
+          ulong: Uint32Array,
+          longlong: undefined, //This should be 64-bit
+          ulonglong: undefined, //This should be 64-bit
+          float: Float32Array,
+          double: Float64Array
+        };
+        var defaultConversion = Float32Array;
+
+        return function(type) {
+          var fn = conversionMap[type];
+          console.log("Requesting dataconverter for type '"+type+"'."+fn);
+
+          if(type == 'octet')
+            console.log("Plot::DataConverter::WARNING - Data type is 'octet' assuming unsigned.");
+
+          if(!fn) {
+            console.log("Plot::DataConverter::WARNING - Data type is '"+type+"' using default.");
+            fn = defaultConversion;
+          }
+
+          return function(data) { return new fn(data); };
+        };
+      })();
+      var dataConverter = getDataConverter(dataType);
+
+      var lastDataSize = 1000;
+      var on_data = function(data){
+        //plots are created when first SRI arrives, to specify format properly
+        if (plot && raster) {
+          var array = dataConverter(data);
+
+          lastDataSize = array.length;
+
+          plot.reload(layer, array);
+          raster.push(layer2, array);
+        }
+      };
+
+      var updatePlotSettings = function(data) {
+        var isDirty = false;
+        angular.forEach(data, function(item, key){
+          if (angular.isDefined($scope.plotSettings[key]) && !angular.equals($scope.plotSettings[key], item) && item != 0) {
+            isDirty = true;
+            console.log("Plot settings change "+key+": "+$scope.plotSettings[key]+" -> "+item);
+            $scope.plotSettings[key] = item;
+          }
+        });
+
+        $scope.plotSettings['size'] = lastDataSize * $scope.plotSettings['xdelta'];
+        if(data['subsize'] == 0) {
+          $scope.plotSettings['subsize'] = lastDataSize;
+        }
+
+        if (!plot || !raster) {
+          var format = undefined;
+          var mode = undefined;
+          switch (data.mode) {
+            case 0:
+              mode = "S";
+              break;
+            case 1:
+              mode = "C";
+              break;
+            default:
+          }
+
+          if (mode) {
+            switch (dataType) {
+              case "float":
+                createPlot(mode + "F", $scope.plotSettings);
+                createRaster(mode + "F", $scope.plotSettings);
+                raster.mimic(plot, {xzoom: true, unzoom: true});
+                console.log("Create plots with format " + mode + "F");
+                break;
+              case "double":
+                createPlot(mode + "D", $scope.plotSettings);
+                createRaster(mode + "D", $scope.plotSettings);
+                raster.mimic(plot, {xzoom: true, unzoom: true});
+                console.log("Create plots with format " + mode + "D");
+                break;
+              default:
+            }
+            isDirty = true;
+          }
+        }
+
+        if(isDirty && $scope.useSRISettings) {
+          setPlots($scope.plotSettings);
+
+          $scope.customSettings = angular.copy($scope.plotSettings);
+        }
+      };
+
+      var sriData = {};
+      var keysFound=[];
+      var on_sri = function(sri) {
+        if (typeof sri === 'string') {
+          return;
+        }
+        updatePlotSettings(sri);
+        angular.forEach(sri, function(value, key){
+          var found = keysFound.some(function(k) {
+            return k == key;
           });
-          sriData[key] = str.join(', ');
-        } else {
-          sriData[ key ] =  value;
-        }
-      });
+          if (!found) {
+            console.log("SRI: " + key + " = " + JSON.stringify(value));
+            keysFound.push(key);
+          }
+          if(angular.isArray(value)) {
+            sriData[key] = value.join(", "); }
+          else if (angular.isObject(value) && typeof value !== 'string') {
+            var str = [];
+            angular.forEach(value, function(value, key) {
+              str.push(key+": "+value);
+            });
+            sriData[key] = '{' + str.join(', ') + '}';
+          } else {
+            sriData[ key ] =  value;
+          }
+        });
 
-      $scope.sri = sriData;
-    };
+        $scope.sri = sriData;
+      };
 
-    $scope.port = RedhawkSocket.port(
-        {domain: user.domain, waveform: $scope.waveformId, component: $scope.componentId, port: $scope.name},
-        on_data,
-        on_sri
-    );
+      $scope.port = RedhawkSocket.port(
+          {domain: user.domain, waveform: $scope.waveformId, component: $scope.componentId, port: $scope.name},
+          on_data,
+          on_sri
+      );
 
-    $scope.$on("$destroy", function(){
-      $scope.port.close();
-    })
-  }])
+      $scope.$on("$destroy", function(){
+        $scope.port.close();
+      })
+    }
+  ])
 ;
