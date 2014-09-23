@@ -1,14 +1,9 @@
+<h2>Device Details</h2>
 <div id="device" class="container">
   <div class="row">
-    <div class="col-md-12">
-
-      <h2>Device Details</h2>
-
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-
+    <div class="col-md-10 col-md-offset-1">
+      <div class="panel panel-default">
+        <div class="panel-heading">
       <h3>
         <strong>{{device.name}}</strong> <status info="device.status"></status>
         <div class="label label-default"><span ng-if="device.started">Started</span><span ng-if="!device.started">Stopped</span></div>
@@ -16,18 +11,19 @@
       </h3>
 
     </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
 
-      <div class="panel panel-default">
+
+
+
         <div class="panel-body">
           <properties info="device.properties"></properties>
         </div>
-      </div>
 
-    </div>
+
+
   </div>
 
 
 </div>
+</div>
+  </div>
