@@ -13,7 +13,7 @@ angular.module('redhawkDirectives', ['RecursionHelper', 'webSCAServices', 'ui.bo
 
                 prop.canEdit = false;
                 if(prop.scaType == 'simple')
-                  prop.canEdit = prop.mode != 'readonly' && prop.kinds.indexOf('configure') > -1;
+                  prop.canEdit = prop.mode != 'readonly' && prop.kinds && prop.kinds.indexOf('configure') > -1;
 
                 if(prop.canEdit) {
                   scope.form[prop.id] = prop.value;
