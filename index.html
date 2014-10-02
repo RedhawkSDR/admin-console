@@ -51,22 +51,29 @@
 
     <nav class="navbar navbar-default" role="navigation">
 
-      <ul class="nav navbar-nav">
-        <li><a class="navbar-brand" href="#"><strong><img class="logo" src="images/RedHawk_Logo_ALT_B_121px.png"/> RH Admin</strong></a></li>
-        <li><a href="#">Overview</a></li>
-        <li class="divider"></li>
-        <li><a href="#/waveforms">Waveforms</a></li>
-        <li><a href="#/deviceManagers">Device Managers</a></li>
-      </ul>
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><strong><i class="fa fa-medkit"></i> Admin Console</strong></a>
+        </div>
 
-      <ul class="nav navbar-right">
-        <!-- Provides a buffer to the right of the form -->
-        <li><p class="navbar-text">&nbsp;</p></li>
-      </ul>
-      <form class="navbar-form navbar-right" role="search">
-        <select ng-model="user.domain" ng-options="id for id in domains" class="form-control input-sm"></select>
-        <!--<button class="btn btn-link" ng-click="addDomain()"><span class="glyphicon glyphicon-plus"></span></button>-->
-      </form>
+        <div class="collapse navbar-collapse" id="navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="#">Overview</a></li>
+            <li class="divider"></li>
+            <li><a href="#/waveforms">Waveforms</a></li>
+            <li><a href="#/deviceManagers">Device Managers</a></li>
+          </ul>
+          <form class="navbar-form navbar-right" role="search">
+            <select ng-model="user.domain" ng-options="id for id in domains" class="form-control input-sm"></select>
+          </form>
+        </div>
+      </div>
 
     </nav>
 
