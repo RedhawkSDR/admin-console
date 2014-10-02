@@ -204,7 +204,7 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
           xi: true,
           fillStyle: ["rgba(224, 255, 194, 0.0)", "rgba(0, 153, 51, 0.7)", "rgba(0, 0, 0, 1.0)"]
         });
-        layer = plot.overlay_array(null, angular.extend(settings, {'format': format}));
+        layer = plot.overlay_array(null, angular.extend(defaultSettings, {'format': format}));
       };
 
       var createRaster = function(format, settings) {
@@ -216,7 +216,7 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
           autohide_panbars: true,
           colors: {bg: "rgba(255,255,255,1)", fg: "rgba(0,0,0,1)"}
         });
-        layer2 = raster.overlay_pipe(angular.extend(settings, {type: 2000, 'format': format, pipe: true, pipesize: 1024 * 1024 * 5}));
+        layer2 = raster.overlay_pipe(angular.extend(defaultSettings, {type: 2000, 'format': format, pipe: true, pipesize: 1024 * 1024 * 5}));
       };
 
       var setLayer = function(layer, settings) {
