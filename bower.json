@@ -1,10 +1,10 @@
 {
-  "name": "rhweb",
-  "version": "0.0.0",
+  "name": "redhawk-admin-console",
+  "version": "1.0.0",
   "authors": [
     "Rob Cannon <rob.cannon@axiosengineering.com>"
   ],
-  "description": "A generic web interface to SCA",
+  "description": "Web-based admin console for REDHAWK",
   "main": "index.html",
   "private": true,
   "ignore": [

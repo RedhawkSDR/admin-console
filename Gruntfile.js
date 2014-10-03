@@ -12,6 +12,29 @@ module.exports = function(grunt) {
   };
 
   var distDir = 'dist';
+  var myBanner = '\
+ /*!                                                                                           \n\
+  * This file is protected by Copyright. Please refer to the COPYRIGHT file                    \n\
+  * distributed with this source distribution.                                                 \n\
+  *                                                                                            \n\
+  * This file is part of REDHAWK <%= pkg.name %>.                                              \n\
+  *                                                                                            \n\
+  * REDHAWK <%= pkg.name %> is free software: you can redistribute it and/or modify it         \n\
+  * under the terms of the GNU Lesser General Public License as published by the               \n\
+  * Free Software Foundation, either version 3 of the License, or (at your                     \n\
+  * option) any later version.                                                                 \n\
+  *                                                                                            \n\
+  * REDHAWK <%= pkg.name %> is distributed in the hope that it will be useful, but WITHOUT     \n\
+  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or                      \n\
+  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License               \n\
+  * for more details.                                                                          \n\
+  *                                                                                            \n\
+  * You should have received a copy of the GNU Lesser General Public License                   \n\
+  * along with this program.  If not, see http://www.gnu.org/licenses/.                        \n\
+  *                                                                                            \n\
+  * <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>          \n\
+  */                                                                                           \n\
+ ';
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -43,7 +66,7 @@ module.exports = function(grunt) {
           endtag: '<!-- endbuild -->'
         },
         files: {
-          'index.html': ['components/**/*.js', 'js/**/*.js', 'css/**/*.css']
+          'index.html': ['components/**/*.js', 'app/**/*.js', 'css/**/*.css']
         }
       }
     },
@@ -90,7 +113,14 @@ module.exports = function(grunt) {
     uglify: {
       options: {
           report: 'min',
-          mangle: false
+          mangle: false,
+          preserveComments: 'some'
+      }
+    },
+    concat: {
+      options: {
+        stripBanners: false,
+        banner: myBanner
       }
     }
   });

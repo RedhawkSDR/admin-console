@@ -1,18 +1,17 @@
 {
-  "name": "rhweb",
-  "version": "0.1.0",
-  "description": "SCA Explorer for the web.",
+  "name": "redhawk-admin-console",
+  "version": "1.0.0",
+  "description": "Web-based admin console for REDHAWK",
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Robert Cannon <rob.cannon@axiosengineering.com",
-  "license": "BSD",
+  "license": "LGPL",
   "devDependencies": {
     "bower": "~1.3.5",
     "grunt": "~0.4.5",
     "grunt-contrib-copy": "~0.5.0",
-    "grunt-injector": "https://github.com/robpc/grunt-injector/archive/0.5.2a.tar.gz",
     "grunt-bower-task": "~0.3.4",
     "grunt-usemin": "~2.2.0",
     "grunt-contrib-concat": "~0.4.0",
@@ -20,6 +19,7 @@
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-angular-templates": "~0.5.5",
-    "grunt-cli": "~0.1.13"
+    "grunt-cli": "~0.1.13",
+    "grunt-injector": "~0.5.4"
   }
 }
