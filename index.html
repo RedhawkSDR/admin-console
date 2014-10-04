@@ -100,10 +100,23 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
       <div id="view" ng-if="user.domain" ng-view redhawk-notification></div>
 
-      <div id="errorNoDomain" ng-if="!user.domain" class="center-block text-center">
-        <div class="panel panel-warning">
-          <div class="panel-body bg-warning">
-            <h3>REDHAWK Domain List Empty</h3>
+      <div class="container" ng-hide="user.domain">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2">
+
+            <div class="center-block text-center">
+              <div class="panel panel-warning">
+                <div class="panel-heading">
+                  Domain Error
+                </div>
+                <div class="panel-body bg-warning">
+                  <h2><i class="fa fa-5x fa-meh-o"></i></h2>
+                  <h3>No REDHAWK Domains Detected</h3>
+                  <p>Try starting a new REDHAWK domain or restarting the server.</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
