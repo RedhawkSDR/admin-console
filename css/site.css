@@ -27,6 +27,10 @@ body {
     font-weight: bold;
 }
 
+.overview-nav a:hover {
+    text-decoration: none;
+}
+
 .rh-property .type {
   font-style: italic;
 }
