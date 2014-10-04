@@ -170,13 +170,13 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
 
       var defaultSettings = {
         xdelta:10.25390625,
-        xstart: 0,
-        xunits: 1,
+        xstart: -1,
+        xunits: 3,
         ydelta : 0.09752380952380953,
         ystart: 0,
-        yunits: 3,
-        subsize: 16385,
-        size: 1,
+        yunits: 1,
+        subsize: 8192,
+        size: 32768,
         format: 'SF'
       };
       $scope.plotSettings = angular.copy(defaultSettings);
@@ -187,7 +187,7 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
       $scope.$watch('useSRISettings', function(value) {
         if(plot && raster && value) {
           $scope.customSettings = angular.copy($scope.plotSettings);
-          setPlots($scope.plotSettings);
+          reloadSri = true;
         }
       });
 
@@ -196,15 +196,20 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
       var createPlot = function(format, settings) {
 
         plot = new sigplot.Plot(document.getElementById("plot"), {
-          //all: true,
-          //expand: true,
           autohide_panbars: true,
           autox: 3,
-          gridBackground: ["rgba(255,255,255,1", "rgba(200,200,200,1"],
+          //autol: 50,
+          autoy: 3,
+          legend: false,
+          xcnt: 0,
+//                  colors: {bg: "#f5f5f5", fg: "#000"},
           xi: true,
+          gridBackground: ["rgba(255,255,255,1", "rgba(200,200,200,1"],
+          all: true,
+          cmode: "D2", //20Log
           fillStyle: ["rgba(224, 255, 194, 0.0)", "rgba(0, 153, 51, 0.7)", "rgba(0, 0, 0, 1.0)"]
         });
-        layer = plot.overlay_array(null, angular.extend(defaultSettings, {'format': format}));
+        layer = plot.overlay_array(null, angular.extend(settings, {'format': format}));
       };
 
       var createRaster = function(format, settings) {
@@ -214,41 +219,23 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
           autol: 100,
           autox: 3,
           autohide_panbars: true,
-          colors: {bg: "rgba(255,255,255,1)", fg: "rgba(0,0,0,1)"}
+          xcnt: 0,
+          cmode: "D2", //20Log
+          gridBackground: ["rgba(255,255,255,1", "rgba(200,200,200,1"],
+          xi: true
+//              colors: {bg: "rgba(255,255,255,1)", fg: "rgba(0,0,0,1)"}
         });
-        layer2 = raster.overlay_pipe(angular.extend(defaultSettings, {type: 2000, 'format': format, pipe: true, pipesize: 1024 * 1024 * 5}));
+        layer2 = raster.overlay_pipe(angular.extend(settings, {type: 2000, 'format': format, pipe: true, pipesize: 1024 * 1024 * 5}));
       };
 
-      var setLayer = function(layer, settings) {
-        var newSettings = angular.copy(settings);
-
-        layer.xstart = newSettings['xstart'];
-        layer.xdelta = newSettings['xdelta'];
-        layer.ystart = newSettings['ystart'];
-        layer.ydelta = newSettings['ydelta'];
-        layer.xlab   = newSettings['xunits'];
-        layer.ylab   = newSettings['yunits'];
-        layer.subsize = newSettings['subsize'];
-        layer.size   = newSettings['size'];
-        layer.mode   = newSettings['mode'];
-      };
-
-      var setPlots = function(settings) {
-        if(settings['yunits'] == 0)
-          settings['yunits'] = 11;
-
-        var plotLayer = plot.get_layer(layer);
-        plotLayer.hcb.size = settings['size'];
-        setLayer( plotLayer, settings );
-
-        var rasterLayer = raster.get_layer(layer2);
-        rasterLayer.hcb.subsize = settings['subsize'];
-        setLayer( rasterLayer, settings );
-      };
+      var reloadSri, useCustomSettings;
 
       $scope.updateCustomSettings = function() {
         if(!$scope.useSRISettings) {
-          setPlots($scope.customSettings);
+          useCustomSettings = true;
+          reloadSri = true;
+        } else {
+          useCustomSettings = false;
         }
       };
 
@@ -303,17 +290,73 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
       var dataConverter = getDataConverter(dataType);
 
       var lastDataSize = 1000;
-      var on_data = function(data){
-        //plots are created when first SRI arrives, to specify format properly
+
+      var on_data = function(data) {
+        var bps;
+        switch (dataType) {
+          case 'double':
+            bps = 2;
+            break;
+          case 'float':
+            bps = 4;
+            break;
+          default:
+            return;
+        };
+
+        var bpe;
+        switch (mode) {
+          case 'S':
+            bpe = bps;
+            break;
+          case 'C':
+            bpe = bps * 2;
+            break;
+          default:
+            return;
+        }
+
+        //USE THIS CODE WHEN back-end is fixed
+        //assume single frame per handler invocation
+//        var array = dataConverter(data);
+//        lastDataSize = array.length;
+//        if (plot && raster) {
+//          reloadPlots(array);
+//        }
+
+        //workaround: take ony number of bytes to make one frame
+        //back-end will be modified to send only one frame
+        var frameSize = $scope.plotSettings.subsize * bpe;
+        //console.log(frameSize + ' bytes extracted');
+        data = data.slice(0, frameSize);
+        var array = dataConverter(data);//NB the return value toggles between two different values. Thus te data is sometimes not properly formatted
+        lastDataSize = array.length;
+        //console.log(array.length + ' elements plotted');
         if (plot && raster) {
-          var array = dataConverter(data);
-
-          lastDataSize = array.length;
-
-          plot.reload(layer, array);
-          raster.push(layer2, array);
+          reloadPlots(array);
         }
       };
+
+      var reloadPlots = function(data) {
+        if (reloadSri ) {
+          if (useCustomSettings) {
+            $scope.plotSettings = $scope.customSettings;
+          }
+          plot.reload(layer, data, $scope.plotSettings);
+          plot.refresh();
+          plot._Gx.ylab = 27; //this is a hack, but the only way I can get sigplot to take the value
+          raster.push(layer, data, $scope.plotSettings);
+          raster.refresh();
+          raster._Gx.ylab = 27; //this is a hack, but the only way I can get sigplot to take the value
+          reloadSri = false;
+        } else {
+          plot.reload(layer, data);
+          raster.push(layer, data);
+          raster._Gx.ylab = 27; //this is a hack, but the only way I can get sigplot to take the value
+        }
+      };
+
+      var mode = undefined;
 
       var updatePlotSettings = function(data) {
         var isDirty = false;
@@ -325,14 +368,13 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
           }
         });
 
-        $scope.plotSettings['size'] = lastDataSize * $scope.plotSettings['xdelta'];
-        if(data['subsize'] == 0) {
-          $scope.plotSettings['subsize'] = lastDataSize;
-        }
+//        $scope.plotSettings['size'] = lastDataSize * $scope.plotSettings['xdelta'];
+//        if(data['subsize'] == 0) {
+//          $scope.plotSettings['subsize'] = lastDataSize;
+//        }
 
         if (!plot || !raster) {
           var format = undefined;
-          var mode = undefined;
           switch (data.mode) {
             case 0:
               mode = "S";
@@ -364,27 +406,26 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
         }
 
         if(isDirty && $scope.useSRISettings) {
-          setPlots($scope.plotSettings);
-
+         reloadSri = true;
           $scope.customSettings = angular.copy($scope.plotSettings);
         }
       };
 
       var sriData = {};
-      var keysFound=[];
+//      var keysFound=[];
       var on_sri = function(sri) {
         if (typeof sri === 'string') {
           return;
         }
         updatePlotSettings(sri);
         angular.forEach(sri, function(value, key){
-          var found = keysFound.some(function(k) {
-            return k == key;
-          });
-          if (!found) {
-            console.log("SRI: " + key + " = " + JSON.stringify(value));
-            keysFound.push(key);
-          }
+//          var found = keysFound.some(function(k) {
+//            return k == key;
+//          });
+//          if (!found) {
+//            console.log("SRI: " + key + " = " + JSON.stringify(value));
+//            keysFound.push(key);
+//          }
           if(angular.isArray(value)) {
             sriData[key] = value.join(", "); }
           else if (angular.isObject(value) && typeof value !== 'string') {
