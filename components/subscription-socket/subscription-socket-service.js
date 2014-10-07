@@ -19,6 +19,11 @@
  */
 angular.module('SubscriptionSocketService', [])
   .service('SubscriptionSocket', ['$rootScope', function ($rootScope) {
+    /**
+     * Convenience class to add a listener pattern to the standard WebSocket
+     *
+     * @constructor
+     */
     var Socket = function() {
       var self = this;
       this.callbacks = {
