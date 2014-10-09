@@ -144,13 +144,6 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
     $scope.user = user;
     $scope.$watch('user.domain', function(domainId) {
       $scope.redhawk = RedhawkDomain.getDomain(domainId);
-
-      $scope.deviceManagers = [];
-      $scope.redhawk.$promise.then(function(data) {
-        angular.forEach(data.deviceManagers, function (value) {
-          $scope.deviceManagers.push($scope.redhawk.getDeviceManager(value.id));
-        });
-      });
     });
 
     $scope.$watch('redhawk.deviceManagers', function(deviceMgrs){

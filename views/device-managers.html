@@ -24,10 +24,10 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
       <div class="panel panel-default">
         <div class="panel-heading">
-          Domain Managers
+          Device Managers
         </div>
 
-        <ul class="list-group">
+        <ul class="list-group selection">
           <a ng-repeat="item in redhawk.deviceManagers" ng-click="setManager(item.id)" ng-class="{'active': (setManager() == item.id) }" class="list-group-item">
             <b>{{item.name}}</b>
           </a>

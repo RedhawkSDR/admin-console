@@ -95,3 +95,7 @@ body {
   margin-right: 60px;
   margin-bottom: 20px;
 }
+
+.selection {
+  cursor: pointer;
+}
