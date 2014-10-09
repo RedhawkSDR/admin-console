@@ -38,7 +38,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
           </div>
         </div>
 
-        <ul class="list-group">
+        <ul class="list-group selection">
           <a ng-repeat="item in redhawk.waveforms" ng-click="setWaveform(item.id)" ng-class="{'active': (setWaveform() == item.id) }" class="list-group-item">
             <b>{{item.name}}</b>
           </a>
