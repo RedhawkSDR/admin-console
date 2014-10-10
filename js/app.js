@@ -208,10 +208,12 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
       var createPlot = function(format, settings) {
 
         plot = new sigplot.Plot(document.getElementById("plot"), {
+          all: true,
+          expand: true,
           autohide_panbars: true,
           autox: 3,
           //autol: 50,
-          autoy: 3,
+//          autoy: 3,
           legend: false,
           xcnt: 0,
 //                  colors: {bg: "#f5f5f5", fg: "#000"},
@@ -304,25 +306,25 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
       var lastDataSize = 1000;
 
       var on_data = function(data) {
-        var bps;
+        var bpa;
         switch (dataType) {
           case 'double':
-            bps = 2;
+            bpa = 2;
             break;
           case 'float':
-            bps = 4;
+            bpa = 4;
             break;
           default:
             return;
         };
 
-        var bpe;
+        var ape;
         switch (mode) {
           case 'S':
-            bpe = bps;
+            ape = 1;
             break;
           case 'C':
-            bpe = bps * 2;
+            ape = 2;
             break;
           default:
             return;
@@ -336,15 +338,20 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
 //          reloadPlots(array);
 //        }
 
-        //workaround: take ony number of bytes to make one frame
+        //WORKAROUND: take only number of bytes to make one frame
         //back-end will be modified to send only one frame
-        var frameSize = $scope.plotSettings.subsize * bpe;
+        var frameSize = $scope.plotSettings.subsize * bpa * ape;
         //console.log(frameSize + ' bytes extracted');
         data = data.slice(0, frameSize);
-        var array = dataConverter(data);//NB the return value toggles between two different values. Thus te data is sometimes not properly formatted
+        var array = dataConverter(data);//NB the return value toggles between two different length values. Thus the data is sometimes not properly formatted
         lastDataSize = array.length;
-        //console.log(array.length + ' elements plotted');
+        //console.log(array.length + ' ' + dataType + ' elements plotted');
         if (plot && raster) {
+          //WORKAROUND: This check should not be necessary. Every other frame seems to have invalid format
+          // apparently containing values that are not of the type specified in dataType
+          if (array.length !== frameSize / bpa) {
+            return;
+          }
           reloadPlots(array);
         }
       };
@@ -356,15 +363,16 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
           }
           plot.reload(layer, data, $scope.plotSettings);
           plot.refresh();
-          plot._Gx.ylab = 27; //this is a hack, but the only way I can get sigplot to take the value
+          plot._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
           raster.push(layer, data, $scope.plotSettings);
           raster.refresh();
-          raster._Gx.ylab = 27; //this is a hack, but the only way I can get sigplot to take the value
+          raster._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
           reloadSri = false;
         } else {
           plot.reload(layer, data);
+          plot._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
           raster.push(layer, data);
-          raster._Gx.ylab = 27; //this is a hack, but the only way I can get sigplot to take the value
+          raster._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
         }
       };
 
@@ -418,7 +426,7 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
         }
 
         if(isDirty && $scope.useSRISettings) {
-         reloadSri = true;
+          reloadSri = true;
           $scope.customSettings = angular.copy($scope.plotSettings);
         }
       };
