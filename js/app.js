@@ -316,10 +316,14 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
         var bpa;
         switch (dataType) {
           case 'double':
-            bpa = 2;
+            bpa = 8;
             break;
           case 'float':
             bpa = 4;
+            break;
+          case 'octet':
+          case 'short':
+            bpa = 1;
             break;
           default:
             return;
@@ -423,6 +427,13 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
               case "double":
                 createPlot(mode + "D", $scope.plotSettings);
                 createRaster(mode + "D", $scope.plotSettings);
+                raster.mimic(plot, {xzoom: true, unzoom: true});
+                console.log("Create plots with format " + mode + "D");
+                break;
+              case "short":
+              case "octet":
+                createPlot(mode + "B", $scope.plotSettings);
+                createRaster(mode + "B", $scope.plotSettings);
                 raster.mimic(plot, {xzoom: true, unzoom: true});
                 console.log("Create plots with format " + mode + "D");
                 break;
