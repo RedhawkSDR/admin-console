@@ -205,6 +205,13 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
 
       var plot, raster, layer, layer2;
 
+      var fillStyle = [
+        "rgba(255, 255, 100, 0.7)",
+        "rgba(255, 0, 0, 0.7)",
+        "rgba(0, 255, 0, 0.7)",
+        "rgba(0, 0, 255, 0.7)"
+      ];
+
       var createPlot = function(format, settings) {
 
         plot = new sigplot.Plot(document.getElementById("plot"), {
@@ -212,17 +219,15 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
           expand: true,
           autohide_panbars: true,
           autox: 3,
-          //autol: 50,
-//          autoy: 3,
           legend: false,
           xcnt: 0,
-//                  colors: {bg: "#f5f5f5", fg: "#000"},
-          xi: true,
-          gridBackground: ["rgba(255,255,255,1", "rgba(200,200,200,1"],
-          all: true,
-          cmode: "D2", //20Log
-          fillStyle: ["rgba(224, 255, 194, 0.0)", "rgba(0, 153, 51, 0.7)", "rgba(0, 0, 0, 1.0)"]
+          colors: {bg: "#222", fg: "#888"},
+          cmode: "D2"
         });
+        plot.change_settings({
+          fillStyle: fillStyle
+        });
+
         layer = plot.overlay_array(null, angular.extend(settings, {'format': format}));
       };
 
@@ -234,10 +239,12 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
           autox: 3,
           autohide_panbars: true,
           xcnt: 0,
-          cmode: "D2", //20Log
-          gridBackground: ["rgba(255,255,255,1", "rgba(200,200,200,1"],
-          xi: true
-//              colors: {bg: "rgba(255,255,255,1)", fg: "rgba(0,0,0,1)"}
+          colors: {bg: "#222", fg: "#888"},
+          cmode: "D2",
+          nogrid: true
+        });
+        raster.change_settings({
+          fillStyle: fillStyle
         });
         layer2 = raster.overlay_pipe(angular.extend(settings, {type: 2000, 'format': format, pipe: true, pipesize: 1024 * 1024 * 5}));
       };
@@ -316,7 +323,7 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
             break;
           default:
             return;
-        };
+        }
 
         var ape;
         switch (mode) {
