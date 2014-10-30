@@ -96,9 +96,9 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
     </nav>
 
-    <div class="container">
+    <div class="container" redhawk-notification>
 
-      <div id="view" ng-if="user.domain" ng-view redhawk-notification></div>
+      <div id="view" ng-if="user.domain" ng-view></div>
 
       <div class="container" ng-hide="user.domain">
         <div class="row">
