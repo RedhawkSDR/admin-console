@@ -77,7 +77,7 @@ angular.module('redhawk-notifications', [])
             $('#redhawk-notification').notify({
               message: {text: message},
               type: severity,
-              fadeOut: {enabled: true, delay: 10000}
+              fadeOut: {enabled: true, delay: 3000}
             }).show();
           }
         }
