@@ -179,8 +179,6 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
 
           self.$promise = RedhawkREST.domain.info({domainId: self._restId}, function(data){
             self._update(data);
-          }, function(data){
-            notify.error("Domain "+id+" returned "+data.status);
           }).$promise;
         };
 
@@ -301,10 +299,15 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
          * @returns {*}
          */
         self.launch = function(name) {
-          return RedhawkREST.waveform.launch({domainId: self._restId}, {name: name}, function(data){
-            notify.success("Waveform "+data['launched']+" launched");
-            self._reload();
-          });
+          return RedhawkREST.waveform.launch({domainId: self._restId}, {name: name},
+            function(data){
+              notify.success("Waveform "+data['launched']+" launched");
+              self._reload();
+            },
+            function(){
+              notify.error("Waveform "+name+" failed to launch.");
+            }
+          );
         };
 
         self._load(id);
@@ -379,8 +382,6 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
           self.$promise = RedhawkREST.waveform.query({id: id, domainId: domainId}, function(data){
             self._update(data);
             self.domainId = domainId;
-          }, function(data){
-            notify.error("Waveform "+id+" returned "+data.status);
           }).$promise;
         };
         /**
@@ -487,8 +488,6 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
             self._update(data);
             self.waveform = {id: waveformId};
             self.domainId = domainId;
-          }, function(data){
-            notify.error("Component "+id+" returned "+data.status);
           }).$promise;
         };
         /**
@@ -539,8 +538,6 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
             self._update(data);
             self.deviceManager = {id: managerId};
             self.domainId = domainId;
-          }, function(data){
-            notify.error("Device "+id+" returned "+data.status);
           }).$promise;
         };
         /**
@@ -585,8 +582,6 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
           self.$promise = RedhawkREST.deviceManager.query({id: id, domainId: domainId}, function(data){
             self._update(data);
             self.domainId = domainId;
-          }, function(data){
-            notify.error("Device Manager "+id+" returned "+data.status);
           }).$promise;
         };
         /**
