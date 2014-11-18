@@ -23,7 +23,15 @@
  * App definition for the webSCA project.
  */
 
-angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives', 'redhawkDirectives', 'ngRoute', 'ui.bootstrap', 'hljs'])
+angular.module('webSCA', [
+    'webSCAConfig',
+    'redhawkServices',
+    'webSCADirectives',
+    'redhawkDirectives',
+    'ngRoute'//,
+//    'ui.bootstrap',
+//    'hljs'
+  ])
   .config(['$routeProvider',
     function($routeProvider) {
       $routeProvider
@@ -56,12 +64,12 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
         });
     }
   ])
-  .config(function (hljsServiceProvider) {
-    hljsServiceProvider.setOptions({
-      // replace tab with 4 spaces
-      tabReplace: ' '
-    });
-  })
+//  .config(function (hljsServiceProvider) {
+//    hljsServiceProvider.setOptions({
+//      // replace tab with 4 spaces
+//      tabReplace: ' '
+//    });
+//  })
   .config(function($logProvider){
     $logProvider.debugEnabled(true);
   })
@@ -83,8 +91,8 @@ angular.module('webSCA', ['webSCAConfig', 'redhawkServices', 'webSCADirectives',
       });
       return user;
   }])
-  .controller('UserSettings', ['$scope', '$modal', 'user', '$timeout', 'RedhawkDomain',
-    function($scope, $modal, user, $timeout, RedhawkDomain){
+  .controller('UserSettings', ['$scope', 'user', '$timeout', 'RedhawkDomain',
+    function($scope, user, $timeout, RedhawkDomain){
       $scope.user = user;
       $scope.domains = RedhawkDomain.getDomainIds();
     }
