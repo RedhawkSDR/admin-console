@@ -15,8 +15,8 @@
     "tests"
   ],
   "dependencies": {
-    "font-awesome": "3.2.1",
-    "bootstrap-css": "~3.1.1",
+    "font-awesome": "=3.2.1",
+    "bootstrap-css": "=3.1.1",
     "angular": "=1.2.20",
     "angular-recursion": "=1.0.4",
     "angular-route": "=1.2.20",

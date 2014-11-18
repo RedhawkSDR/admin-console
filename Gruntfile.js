@@ -66,7 +66,7 @@ module.exports = function(grunt) {
           endtag: '<!-- endbuild -->'
         },
         files: {
-          'index.html': ['components/**/*.js', 'app/**/*.js', 'css/**/*.css']
+          'index.html': ['components/**/*.js', 'js/**/*.js', 'css/**/*.css']
         }
       }
     },
@@ -76,8 +76,14 @@ module.exports = function(grunt) {
       dist: {
         files: [
           {expand: true, src: ['index.html', 'images/**'], dest: distDir},
-          {expand: true, cwd: 'bower_components/font-awesome/', src: 'fonts/**', dest: distDir},
+          {expand: true, cwd: 'bower_components/font-awesome/', src: 'font/**', dest: distDir},
           {expand: true, cwd: 'bower_components/bootstrap-css/', src: 'fonts/**', dest: distDir}
+        ]
+      },
+      dev: {
+        files: [
+          {expand: true, cwd: 'bower_components/font-awesome/', src: 'font/**', dest: './'},
+          {expand: true, cwd: 'bower_components/bootstrap-css/', src: 'fonts/**', dest: './'}
         ]
       }
     },
@@ -135,6 +141,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-usemin');
   grunt.loadNpmTasks('grunt-angular-templates');
 
-  grunt.registerTask('default', ['bower:dev', 'injector:vendor', 'injector:deps']);
-  grunt.registerTask('dist', ['clean', 'copy', 'bower', 'useminPrepare', 'ngtemplates', 'concat', 'cssmin', 'uglify', 'usemin']);
+  grunt.registerTask('default', ['bower:dev', 'copy:dev', 'injector:vendor', 'injector:deps']);
+  grunt.registerTask('dist', ['clean', 'copy:dist', 'bower', 'useminPrepare', 'ngtemplates', 'concat', 'cssmin', 'uglify', 'usemin']);
 };
