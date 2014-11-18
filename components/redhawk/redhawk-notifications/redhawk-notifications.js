@@ -17,70 +17,46 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-angular.module('redhawk-notifications', [])
-  .service('RedhawkNotificationService', [function(){
-    var self = this;
+angular.module('redhawk-notifications', [
+    'toastr'
+  ])
+  .config(function(toastrConfig) {
+    angular.extend(toastrConfig, {
+      positionClass: 'toast-bottom-right'
+    });
+  })
+  .service('RedhawkNotificationService', [
+    'toastr',
+    function(toastr){
+      var self = this;
 
-    self._messages = [];
-    self._callbacks = [];
+      self.msg = function(severity, message, subject) {
+        var title = subject || severity.toUpperCase();
 
-    var Msg = function(severity, text) {
-      return {
-        severity: severity,
-        text: text
-      };
-    };
-
-    self.addListener = function(callbackFn) {
-      var index = $.inArray(callbackFn, self._callbacks);
-      if(index < 0)
-        self._callbacks.push(callbackFn);
-    };
-    self.removeListener = function(callbackFn) {
-      var index = $.inArray(callbackFn, self._callbacks);
-      if(index > -1)
-        self._callbacks = self._callbacks.splice(index, 1);
-    };
-    self._callListeners = function(msg){
-      angular.forEach(self._callbacks, function(fn){
-        fn.call(null, msg);
-      });
-    };
-
-    self.msg = function(severity, text) {
-      self._callListeners(new Msg(severity, text));
-    };
-
-    self.error = function(text) {
-      self.msg("danger", text);
-    };
-    self.info = function(text) {
-      self.msg("info", text);
-    };
-    self.success = function(text) {
-      self.msg("success", text);
-    };
-  }])
-  .directive('redhawkNotification',['RedhawkNotificationService',
-    function(RedhawkNotificationService) {
-      return {
-        restrict: 'A',
-        link: function(scope, element, attrs) {
-          element.append('<div id="redhawk-notification" class="notifications bottom-right"></div>');
-
-          RedhawkNotificationService.addListener(function(msg){
-            scope.addAlert(msg.severity, msg.text);
-          });
-
-          scope.addAlert = function(severity, message){
-            console.log("["+severity.toUpperCase()+"] :: "+message);
-            $('#redhawk-notification').notify({
-              message: {text: message},
-              type: severity,
-              fadeOut: {enabled: true, delay: 3000}
-            }).show();
-          }
+        console.log("["+severity.toUpperCase()+"] :: "+message);
+        switch (severity) {
+          case 'error':
+            toastr.error(message, title);
+            break;
+          case 'success':
+            toastr.success(message, title);
+            break;
+          case 'info':
+          default:
+            toastr.info(message, title);
+            break;
         }
       };
-    }])
+
+      self.error = function(text, subject) {
+        self.msg("error", text, subject);
+      };
+      self.info = function(text, subject) {
+        self.msg("info", text, subject);
+      };
+      self.success = function(text, subject) {
+        self.msg("success", text, subject);
+      };
+    }
+  ])
 ;

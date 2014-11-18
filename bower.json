@@ -21,6 +21,7 @@
     "angular-recursion": "=1.0.4",
     "angular-route": "=1.2.20",
     "angular-resource": "=1.2.20",
-    "jQuery": "~2.1.1"
+    "jQuery": "=2.1.1",
+    "angular-toastr": "=0.4.0"
   }
 }
