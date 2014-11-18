@@ -18,7 +18,7 @@ details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program.  If not, see http://www.gnu.org/licenses/.
 -->
-  <h4 ng-if="title === undefined ? true : title"><span class="fa fa-gears" ></span> Properties <json-source json-data="properties"></json-source></h4>
+  <h4 ng-if="title === undefined ? true : title"><i class="icon-gears" ></i> Properties <json-source json-data="properties"></json-source></h4>
   <div class="container-fluid" onload="this.tooltip()">
     <form role="form" class="form-inline" ng-submit="submit()">
 
@@ -87,14 +87,14 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 </div>
 <span ng-if="compact">
   <button class="btn btn-sm btn-default" data-toggle="modal" data-target="#properties-{{$id}}">
-    <span class="fa fa-gears"></span>
+    <i class="icon-gears"></i>
   </button>
   <div class="modal fade" id="properties-{{$id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title"><span class="fa fa-gears"></span> Properties <small><json-source json-data="properties"></json-source></small></h4>
+          <h4 class="modal-title"><i class="icon-gears"></i> Properties <small><json-source json-data="properties"></json-source></small></h4>
         </div>
         <div class="modal-body">
           <properties info="properties" can-edit="canEdit" configure="configure({properties: properties})" title="false"></properties>

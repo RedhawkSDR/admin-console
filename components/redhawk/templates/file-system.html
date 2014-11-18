@@ -39,7 +39,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
         </a>
         <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu-{{$id}}">
           <li role="presentation" ng-class="{'disabled': !item.canView}" >
-            <a role="menuitem" ng-click="fileViewer(filesystem.cwd+'/'+item.name)"><span class="fa fa-code"></span> File Viewer</a>
+            <a role="menuitem" ng-click="fileViewer(filesystem.cwd+'/'+item.name)"><i class="icon-code"></i> File Viewer</a>
           </li>
           <li role="presentation" class="divider"></li>
           <li role="presentation"><a role="menuitem" tabindex="-1" href="{{fileUrl(filesystem.cwd+'/'+item.name)}}">
