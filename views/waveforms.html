@@ -42,6 +42,9 @@ with this program.  If not, see http://www.gnu.org/licenses/.
           <a ng-repeat="item in redhawk.waveforms" ng-click="setWaveform(item.id)" ng-class="{'active': (setWaveform() == item.id) }" class="list-group-item">
             <b>{{item.name}}</b>
           </a>
+          <a class="list-group-item" ng-hide="redhawk.waveforms.length">
+            <i>No Waveforms Running</i>
+          </a>
         </ul>
 
         <div class="panel-footer">
@@ -54,6 +57,16 @@ with this program.  If not, see http://www.gnu.org/licenses/.
     </div>
     <div class="col-md-9">
       <waveform ng-show="redhawk.waveforms.length" id="currentWaveform" domain-id="redhawk._restId"></waveform>
+
+      <div class="center-block text-center text-muted" ng-hide="redhawk.waveforms.length">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <h2><i class="icon-eye-close icon-3x"></i></h2>
+            <h3>No Waveform Selected</h3>
+            <p>Try selecting one from the list on the left or launching a new one.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

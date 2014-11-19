@@ -31,6 +31,9 @@ with this program.  If not, see http://www.gnu.org/licenses/.
           <a ng-repeat="item in redhawk.deviceManagers" ng-click="setManager(item.id)" ng-class="{'active': (setManager() == item.id) }" class="list-group-item">
             <b>{{item.name}}</b>
           </a>
+          <a class="list-group-item" ng-hide="redhawk.deviceManagers">
+            <i>No Device Managers found</i>
+          </a>
         </ul>
 
         <div class="panel-footer">
@@ -43,7 +46,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
     </div>
     <div class="col-md-9">
 
-      <div class="panel panel-default">
+      <div class="panel panel-default" ng-show="manager">
         <div class="panel-heading">
           <h3 class="panel-title">{{manager.name}} <status info="manager.status"></status> <small>{{manager.id}}</small><json-source json-data="manager"></json-source></h3>
         </div>
@@ -81,6 +84,18 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
         </div>
       </div>
+
+
+      <div class="center-block text-center text-muted" ng-hide="manager">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <h2><i class="icon-eye-close icon-3x"></i></h2>
+            <h3>No Device Manager Selected</h3>
+            <p>Try selecting one from the list on the left.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
