@@ -31,8 +31,8 @@ angular.module('RedhawkConfig', [])
       return new_uri;
     };
 
-    this.restPath = '/rh/rest';
-    this.wsPath = '/rh/rest';
+    this.restPath = '/redhawk/rest';
+    this.wsPath = '/redhawk/rest';
     this.websocketUrl = getWSBasePath() + this.wsPath;
     this.restUrl = this.restPath;
 

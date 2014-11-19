@@ -246,14 +246,14 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
         /**
          * Get a component object from this domain.
          * @param id
-         * @param waveformId
+         * @param applicationId
          * @returns {*}
          */
-        self.getComponent = function(id, waveformId){
-          var compId = uniqueId(id, waveformId);
+        self.getComponent = function(id, applicationId){
+          var compId = uniqueId(id, applicationId);
 
           if(!self.components[compId]) {
-            self.components[compId] = new Component(id, self._restId, waveformId);
+            self.components[compId] = new Component(id, self._restId, applicationId);
           }
 
           return self.components[compId];
@@ -463,10 +463,10 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
        *
        * @param id
        * @param domainId
-       * @param waveformId
+       * @param applicationId
        * @constructor
        */
-      var Component = function(id, domainId, waveformId) {
+      var Component = function(id, domainId, applicationId) {
         var self = this;
 
         /**
@@ -483,10 +483,10 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
         /**
          * @see {Domain._load()}
          */
-        self._load = function(id, domainId, waveformId) {
-          self.$promise = RedhawkREST.component.query({componentId: id, waveformId: waveformId, domainId: domainId}, function(data){
+        self._load = function(id, domainId, applicationId) {
+          self.$promise = RedhawkREST.component.query({componentId: id, applicationId: applicationId, domainId: domainId}, function(data){
             self._update(data);
-            self.waveform = {id: waveformId};
+            self.waveform = {id: applicationId};
             self.domainId = domainId;
           }).$promise;
         };
@@ -500,13 +500,13 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
          */
         self.configure = function(properties) {
           return RedhawkREST.component.configure(
-              {componentId: self.id, waveformId: self.waveform.id, domainId: self.domainId},
+              {componentId: self.id, applicationId: self.waveform.id, domainId: self.domainId},
               {properties: properties},
               function(){ self._reload(); }
           );
         };
 
-        self._load(id, domainId, waveformId);
+        self._load(id, domainId, applicationId);
       };
 
       /**
@@ -726,10 +726,10 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
               domain._reload();
             break;
           case "ScaWaveform":
-            var waveformId = event.waveformInstance;
-            if(domain.waveforms[waveformId]){
-              //console.log("Updating Waveform  "+waveformId);
-              domain.waveforms[waveformId]._update(element);
+            var applicationId = event.waveformInstance;
+            if(domain.waveforms[applicationId]){
+              //console.log("Updating Application  "+applicationId);
+              domain.waveforms[applicationId]._update(element);
             }
             break;
           case "ScaComponent":
@@ -773,7 +773,7 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
         if(options.domain)
           url += '/domains/'+options.domain;
         if(options.waveform)
-          url += '/waveforms/'+options.waveform;
+          url += '/applications/'+options.waveform;
         if(options.component)
           url += '/components/'+options.component;
         if(options.port)

@@ -35,16 +35,16 @@ angular.module('RedhawkREST', ['ngResource', 'RedhawkConfig'])
     this.device = $resource(RedhawkConfig.restUrl + '/domains/:domainId/deviceManagers/:managerId/devices/:deviceId', {}, {
       query: {method: 'GET'}
     });
-    this.waveform = $resource(RedhawkConfig.restUrl + '/domains/:domainId/waveforms', {}, {
-      query:     {method: 'GET',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id'},
-      status:    {method: 'GET',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms'},
-      launch:    {method: 'POST',   url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms'},
-      release:   {method: 'DELETE', url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id'},
-      update:    {method: 'POST',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id'},
-      configure: {method: 'PUT',    url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:id/properties'}
+    this.waveform = $resource(RedhawkConfig.restUrl + '/domains/:domainId/applications', {}, {
+      query:     {method: 'GET',    url: RedhawkConfig.restUrl + '/domains/:domainId/applications/:id'},
+      status:    {method: 'GET',    url: RedhawkConfig.restUrl + '/domains/:domainId/applications'},
+      launch:    {method: 'POST',   url: RedhawkConfig.restUrl + '/domains/:domainId/applications'},
+      release:   {method: 'DELETE', url: RedhawkConfig.restUrl + '/domains/:domainId/applications/:id'},
+      update:    {method: 'POST',   url: RedhawkConfig.restUrl + '/domains/:domainId/applications/:id'},
+      configure: {method: 'PUT',    url: RedhawkConfig.restUrl + '/domains/:domainId/applications/:id/properties'}
     });
-    this.component = $resource(RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:waveformId/components/:componentId', {}, {
+    this.component = $resource(RedhawkConfig.restUrl + '/domains/:domainId/applications/:applicationId/components/:componentId', {}, {
       query: {method: 'GET'},
-      configure: {method: 'PUT', url: RedhawkConfig.restUrl + '/domains/:domainId/waveforms/:waveformId/components/:componentId/properties'}
+      configure: {method: 'PUT', url: RedhawkConfig.restUrl + '/domains/:domainId/applications/:applicationId/components/:componentId/properties'}
     });
   }]);
