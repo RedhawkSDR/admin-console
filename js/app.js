@@ -103,8 +103,8 @@ angular.module('webSCA', [
       $scope.$watch('user.domain', function(domainId){
         if(!domainId) return;
 
-        $scope.redhawk = RedhawkDomain.getDomain(domainId);
-        var events = $scope.redhawk.getEvents();
+        $scope.domain = RedhawkDomain.getDomain(domainId);
+        var events = $scope.domain.getEvents();
 
         $scope.messages = events.getMessages();
         $scope.channels = events.getChannelNames();
@@ -122,15 +122,15 @@ angular.module('webSCA', [
   .controller('Waveforms', ['$scope', 'RedhawkDomain', 'user', function($scope, RedhawkDomain, user) {
     $scope.user = user;
     $scope.$watch('user.domain', function(domainId) {
-      $scope.redhawk = RedhawkDomain.getDomain(domainId);
+      $scope.domain = RedhawkDomain.getDomain(domainId);
 
-      $scope.waveforms = $scope.redhawk.getLaunchableWaveforms();
+      $scope.waveforms = $scope.domain.getLaunchableWaveforms();
 
       $scope.currentWaveform = null;
     });
 
-    $scope.$watch('redhawk.waveforms', function(waveforms){
-      if(waveforms.length)
+    $scope.$watch('domain.applications', function(waveforms){
+      if(waveforms && waveforms.length)
         $scope.setWaveform(waveforms[0].id);
     });
 
@@ -141,8 +141,8 @@ angular.module('webSCA', [
     };
 
     $scope.launch = function(name) {
-      $scope.redhawk.launch(name).$promise.then(function(waveform){
-        $scope.redhawk.$promise.then(function(){
+      $scope.domain.launch(name).$promise.then(function(waveform){
+        $scope.domain.$promise.then(function(){
           $scope.setWaveform(waveform.id);
         });
       })
@@ -368,9 +368,9 @@ angular.module('webSCA', [
         if (plot && raster) {
           //WORKAROUND: This check should not be necessary. Every other frame seems to have invalid format
           // apparently containing values that are not of the type specified in dataType
-          if (array.length !== frameSize / bpa) {
-            return;
-          }
+          //if (array.length !== frameSize / bpa) {
+          //  return;
+          //}
           reloadPlots(array);
         }
       };

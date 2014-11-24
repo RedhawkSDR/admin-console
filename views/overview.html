@@ -24,7 +24,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3><strong>{{redhawk.name}}</strong> <status info="redhawk.status"></status> <small>{{redhawk.id}} <json-source json-data="redhawk"></json-source></small></h3>
+          <h3><strong>{{domain.name}}</strong> <status info="domain.status"></status> <small>{{domain.id}} <json-source json-data="domain"></json-source></small></h3>
         </div>
         <div class="panel-body">
 
@@ -34,7 +34,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
                 <!--<div>-->
                 <!--<h4>File System</h4>-->
-                <!--<file-system domain-id="redhawk._restId"></file-system>-->
+                <!--<file-system domain-id="domain._restId"></file-system>-->
                 <!--</div>-->
 
                 <div class="row">
@@ -42,7 +42,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
                     <div class="text-center overview-nav">
                       <a href="#/waveforms">
-                        <h1 class="text-info">{{redhawk.waveforms.length}}</h1>
+                        <h1 class="text-info">{{domain.applications.length}}</h1>
                         <h3 class="number-header ">Waveforms</h3>
                       </a>
                     </div>
@@ -52,7 +52,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
                     <div class="text-center overview-nav">
                       <a href="#/deviceManagers">
-                        <h1 class="text-info">{{redhawk.deviceManagers.length}}</h1>
+                        <h1 class="text-info">{{domain.deviceManagers.length}}</h1>
                         <h3 class="number-header">Device Managers</h3>
                       </a>
                     </div>
@@ -64,7 +64,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
             <div class="row">
               <div class="col-md-12">
 
-                <properties info="redhawk.properties" can-edit="true" configure="configure(properties)"></properties>
+                <properties info="domain.properties" can-edit="true" configure="configure(properties)"></properties>
 
               </div>
             </div>

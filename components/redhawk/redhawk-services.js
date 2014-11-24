@@ -125,9 +125,9 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
        */
       var processPorts = function(ports) {
         angular.forEach(ports, function(port) {
-          var matches = portDataTypeRegex.exec(port.type);
+          var matches = portDataTypeRegex.exec(port.idl.type);
           if(matches) {
-            port.canPlot = port.direction == "Uses" && port.namespace == "BULKIO";
+            port.canPlot = port.direction == "Uses" && port.idl.namespace == "BULKIO";
             if(port.canPlot)
               port.plotType = matches[1].toLowerCase();
           } else {
@@ -281,7 +281,7 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
             redhawk.availableWaveforms = [];
             redhawk.availableWaveforms.$promise =
                 RedhawkREST.waveform.status({domainId: self._restId}).$promise.then(function(data){
-                  angular.forEach(data['available'], function(item){
+                  angular.forEach(data['waveforms'], function(item){
                     this.push(item['name']);
                   },redhawk.availableWaveforms);
 
