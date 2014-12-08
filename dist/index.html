@@ -1,0 +1,99 @@
+<!doctype html>
+<!--
+This file is protected by Copyright. Please refer to the COPYRIGHT file
+distributed with this source distribution.
+
+This file is part of REDHAWK redhawk-admin-console.
+
+REDHAWK redhawk-admin-console is free software: you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+REDHAWK redhawk-admin-console is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with this program.  If not, see http://www.gnu.org/licenses/.
+-->
+<html lang="en" ng-app="webSCA">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="images/RedHawk_Logo_ALT_B_121px.png"/>
+
+    <title>RH Admin Console</title>
+
+    <script src="lib/vendor.js"></script>
+
+    <script src="js/app.js"></script>
+
+    <link rel="stylesheet" href="lib/vendor.css"/>
+
+    <link rel="stylesheet" href="css/app.css"/>
+  </head>
+  <body ng-controller="UserSettings">
+
+    <nav class="navbar navbar-default" role="navigation">
+
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><strong><i class="icon-medkit"></i> Admin Console</strong></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="#">Overview</a></li>
+            <li class="divider"></li>
+            <li><a href="#/waveforms">Waveforms</a></li>
+            <li><a href="#/deviceManagers">Device Managers</a></li>
+          </ul>
+          <form class="navbar-form navbar-right" role="search">
+            <select ng-model="user.domain" ng-options="id for id in domains" class="form-control input-sm"></select>
+          </form>
+        </div>
+      </div>
+
+    </nav>
+
+    <div class="container" redhawk-notification>
+
+      <div id="view" ng-if="user.domain" ng-view></div>
+
+      <div class="container" ng-hide="user.domain">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2">
+
+            <div class="center-block text-center">
+              <div class="panel panel-warning">
+                <div class="panel-heading">
+                  Domain Error
+                </div>
+                <div class="panel-body bg-warning">
+                  <h2><i class="icon-meh icon-4x"></i></h2>
+                  <h3>No REDHAWK Domains Detected</h3>
+                  <p>Try starting a new REDHAWK domain or restarting the server.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="container">
+      <div id="footer"></div>
+    </div>
+
+  </body>
+</html>
