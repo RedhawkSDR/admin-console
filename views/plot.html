@@ -45,7 +45,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
           <span class="glyphicon" ng-class="{'glyphicon-chevron-down': showOptions, 'glyphicon-chevron-right': !showOptions}"></span>
           Plotting Options
         </div>
-        <div class="panel-body" collapse="!showOptions">
+        <div class="panel-body" ng-class="{'collapse': !showOptions}">
           <form role="form" class="form-horizontal">
             <div class="checkbox col-sm-offset-2 col-sm-10">
               <label>
