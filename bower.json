@@ -1,8 +1,8 @@
 {
   "name": "redhawk-admin-console",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "authors": [
-    "Rob Cannon <rob.cannon@axiosengineering.com>"
+    "redhawksdr@redhawksdr.org"
   ],
   "description": "Web-based admin console for REDHAWK",
   "main": "index.html",
