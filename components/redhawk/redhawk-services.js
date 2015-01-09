@@ -125,14 +125,20 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
        */
       var processPorts = function(ports) {
         angular.forEach(ports, function(port) {
-          var matches = portDataTypeRegex.exec(port.idl.type);
-          if(matches) {
-            port.canPlot = port.direction == "Uses" && port.idl.namespace == "BULKIO";
-            if(port.canPlot)
-              port.plotType = matches[1].toLowerCase();
+          if(port.direction != "Uses") {
+            port.canPlot = false;
+            return;
+          }
+
+          var idl = port.idl;
+          var matches = portDataTypeRegex.exec(idl.type);
+
+          if(idl.namespace == "BULKIO" && matches) {
+            port.canPlot = true;
+            port.plotType = matches[1].toLowerCase();
           } else {
             port.canPlot = false;
-            console.log("DEBUG: " + port + " port has unrecognized repid: " + port.repid);
+            console.log("DEBUG: " + port.name + " port has unrecognized repid: " + port.repId)
           }
         });
       };
