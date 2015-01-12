@@ -26,7 +26,7 @@
 
 Prefix:         %{_prefix}
 Name:		redhawk-admin-console
-Version:	1.0.0
+Version:	2.0.0
 Release:	1%{?dist}
 Summary:	The REDHAWK Web Baseline used for web applications
 
@@ -36,7 +36,7 @@ Source0:        %{name}-%{version}.tar.gz
 
 Requires:       redhawk >= 1.10
 Requires:       redhawk-web
-Requires:       redhawk-rest-python
+Requires:       redhawk-rest-python >= 2.0.0
 BuildRequires:  npm
 BuildRequires:  git
 

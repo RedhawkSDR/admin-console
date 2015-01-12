@@ -17,7 +17,7 @@
   * You should have received a copy of the GNU Lesser General Public License                   
   * along with this program.  If not, see http://www.gnu.org/licenses/.                        
   *                                                                                            
-  * redhawk-admin-console - v1.0.0 - 2014-12-08          
+  * redhawk-admin-console - v2.0.0 - 2014-12-19          
   */
 /*!
  * jQuery JavaScript Library v2.1.1
