@@ -427,21 +427,21 @@ angular.module('webSCA', [
           if (mode) {
             switch (dataType) {
               case "float":
-                createPlot(mode + "F", $scope.plotSettings);
-                createRaster(mode + "F", $scope.plotSettings);
+                createPlot(mode + "F", defaultSettings);
+                createRaster(mode + "F", defaultSettings);
                 raster.mimic(plot, {xzoom: true, unzoom: true});
                 console.log("Create plots with format " + mode + "F");
                 break;
               case "double":
-                createPlot(mode + "D", $scope.plotSettings);
-                createRaster(mode + "D", $scope.plotSettings);
+                createPlot(mode + "D", defaultSettings);
+                createRaster(mode + "D",defaultSettings);
                 raster.mimic(plot, {xzoom: true, unzoom: true});
                 console.log("Create plots with format " + mode + "D");
                 break;
               case "short":
               case "octet":
-                createPlot(mode + "B", $scope.plotSettings);
-                createRaster(mode + "B", $scope.plotSettings);
+                createPlot(mode + "B", defaultSettings);
+                createRaster(mode + "B", defaultSettings);
                 raster.mimic(plot, {xzoom: true, unzoom: true});
                 console.log("Create plots with format " + mode + "D");
                 break;
