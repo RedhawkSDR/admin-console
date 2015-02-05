@@ -57,7 +57,7 @@ npm install
 %{grunt} dist
 
 mkdir -p $RPM_BUILD_ROOT%{_prefix}
-cp -R dist $RPM_BUILD_ROOT%/var/redhawk/web/admin-console
+cp -R dist $RPM_BUILD_ROOT/var/redhawk/web/admin-console
 
 mkdir -p $RPM_BUILD_ROOT/etc/nginx/conf.d/redhawk-sites
 cp deploy/admin-console-nginx.conf $RPM_BUILD_ROOT%{_nginx}/redhawk-admin-console.enabled
