@@ -37,8 +37,6 @@ with this program.  If not, see http://www.gnu.org/licenses/.
   </head>
   <body ng-controller="UserSettings">
 
-  <toaster-container toaster-options="{'position-class': 'toast-top-full-width'}">
-
     <nav class="navbar navbar-default" role="navigation">
 
       <div class="container-fluid">
@@ -67,8 +65,6 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
     </nav>
 
-    <div class="container" redhawk-notification>
-
       <div id="view" ng-if="user.domain" ng-view></div>
 
       <div class="container" ng-hide="user.domain">
@@ -92,10 +88,11 @@ with this program.  If not, see http://www.gnu.org/licenses/.
         </div>
       </div>
 
-    </div>
     <div class="container">
       <div id="footer"></div>
     </div>
-  </toaster-container>
+    
+    <toaster-container toaster-options="{'position-class': 'toast-bottom-right'}"></toaster-container>
+
   </body>
 </html>
