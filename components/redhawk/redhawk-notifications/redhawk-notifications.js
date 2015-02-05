@@ -21,11 +21,6 @@ angular.module('ngAnimate',[]);
 angular.module('redhawk-notifications', [
     'toaster',
   ])
-  //.config(function(toastrConfig) {
-  //  angular.extend(toastrConfig, {
-  //    positionClass: 'toast-bottom-right'
-  //  });
-  //})
   .service('RedhawkNotificationService', [
     'toaster',
     function(toastr){
