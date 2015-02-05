@@ -17,16 +17,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
+angular.module('ngAnimate',[]);
 angular.module('redhawk-notifications', [
-    'toastr'
+    'toaster',
   ])
-  .config(function(toastrConfig) {
-    angular.extend(toastrConfig, {
-      positionClass: 'toast-bottom-right'
-    });
-  })
+  //.config(function(toastrConfig) {
+  //  angular.extend(toastrConfig, {
+  //    positionClass: 'toast-bottom-right'
+  //  });
+  //})
   .service('RedhawkNotificationService', [
-    'toastr',
+    'toaster',
     function(toastr){
       var self = this;
 
@@ -36,14 +37,14 @@ angular.module('redhawk-notifications', [
         console.log("["+severity.toUpperCase()+"] :: "+message);
         switch (severity) {
           case 'error':
-            toastr.error(message, title);
+            toastr.pop('error', title, message);
             break;
           case 'success':
-            toastr.success(message, title);
+            toastr.pop('success', title, message);
             break;
           case 'info':
           default:
-            toastr.info(message, title);
+            toastr.pop('info', title, message);
             break;
         }
       };

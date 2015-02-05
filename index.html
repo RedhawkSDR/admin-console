@@ -34,7 +34,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
     <script src="bower_components/angular-recursion/angular-recursion.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
-    <script src="bower_components/angular-toastr/dist/angular-toastr.js"></script>
+    <script src="bower_components/angularjs-toaster/toaster.js"></script>
     <!-- endbuild -->
 
     <!-- build:js js/app.js -->
@@ -54,7 +54,7 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
     <!-- build:css lib/vendor.css -->
     <link rel="stylesheet" href="bower_components/bootstrap-css/css/bootstrap.min.css">
-    <link rel="stylesheet" href="bower_components/angular-toastr/dist/angular-toastr.css">
+    <link rel="stylesheet" href="bower_components/angularjs-toaster/toaster.css">
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css">
     <!-- endbuild -->
 
@@ -92,8 +92,6 @@ with this program.  If not, see http://www.gnu.org/licenses/.
 
     </nav>
 
-    <div class="container" redhawk-notification>
-
       <div id="view" ng-if="user.domain" ng-view></div>
 
       <div class="container" ng-hide="user.domain">
@@ -117,10 +115,11 @@ with this program.  If not, see http://www.gnu.org/licenses/.
         </div>
       </div>
 
-    </div>
     <div class="container">
       <div id="footer"></div>
     </div>
+    
+    <toaster-container toaster-options="{'position-class': 'toast-bottom-right'}"></toaster-container>
 
   </body>
 </html>
