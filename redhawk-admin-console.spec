@@ -73,7 +73,6 @@ rm -rf %{buildroot}
 %{_client}/images
 %{_client}/js
 %{_client}/lib
-%{_client}/fonts
 %{_client}/font
 
 %defattr(-,root,root,-)
