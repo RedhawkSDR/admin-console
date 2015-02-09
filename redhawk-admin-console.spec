@@ -52,6 +52,7 @@ BuildRequires:  git
 %build
 
 %install
+%{?npm_registry: npm set registry %{npm_registry} }
 npm install
 %{bower} install
 %{grunt} dist
@@ -78,4 +79,10 @@ rm -rf %{buildroot}
 
 %defattr(-,root,root,-)
 %{_nginx}/redhawk-admin-console.enabled
+
+
+
+%changelog
+* Mon Feb 9 2015 Youssef Bagoulla <youssef.bagoulla@axiosengineering.com> - 2.0.0-1
+- Allowing flag for custom npm server.
 
