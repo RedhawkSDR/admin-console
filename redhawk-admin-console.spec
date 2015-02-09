@@ -54,7 +54,6 @@ BuildRequires:  git
 %install
 %{?npm_registry: npm set registry %{npm_registry} }
 npm install
-%{bower} install
 %{grunt} dist
 
 mkdir -p $RPM_BUILD_ROOT%{_prefix}
@@ -83,5 +82,5 @@ rm -rf %{buildroot}
 
 %changelog
 * Mon Feb 9 2015 Youssef Bagoulla <youssef.bagoulla@axiosengineering.com> - 2.0.0-1
-- Allowing flag for custom npm server.
+- Allowing flag for custom npm server, removing bower install since bower components are tracked.
 
