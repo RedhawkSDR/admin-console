@@ -74,6 +74,7 @@ rm -rf %{buildroot}
 %{_client}/js
 %{_client}/lib
 %{_client}/font
+%{_client}/fonts
 
 %defattr(-,root,root,-)
 %{_nginx}/redhawk-admin-console.enabled
