@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "angular": ">1.2.6",
-    "angular-animate": ">1.2.8"
+    "angular-animate": "=1.2.8"
   },
   "homepage": "https://github.com/jirikavi/AngularJS-Toaster",
   "_release": "0.4.10",
