@@ -54,6 +54,7 @@ BuildRequires:  git
 %install
 %{?npm_registry: npm set registry %{npm_registry} }
 npm install
+%{grunt} default
 %{grunt} dist
 
 mkdir -p $RPM_BUILD_ROOT%{_prefix}
