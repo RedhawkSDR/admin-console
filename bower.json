@@ -22,6 +22,7 @@
     "angular-route": "=1.2.20",
     "angular-resource": "=1.2.20",
     "jQuery": "=2.1.1",
+    "angular-animate": ">1.2.8",
     "angularjs-toaster": "=0.4.10"
   }
 }
