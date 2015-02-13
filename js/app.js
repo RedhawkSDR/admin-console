@@ -195,9 +195,8 @@ angular.module('webSCA', [
         ydelta : 0.09752380952380953,
         ystart: 0,
         yunits: 1,
-        subsize: 8192,
-        size: 32768,
-        format: 'SF'
+        subsize: 0,
+        size: 8192
       };
       $scope.plotSettings = angular.copy(defaultSettings);
 
@@ -230,7 +229,8 @@ angular.module('webSCA', [
           legend: false,
           xcnt: 0,
           colors: {bg: "#222", fg: "#888"},
-          cmode: "D2"
+          cmode: "D2",
+          'format': format
         });
         plot.change_settings({
           fillStyle: fillStyle
@@ -249,7 +249,8 @@ angular.module('webSCA', [
           xcnt: 0,
           colors: {bg: "#222", fg: "#888"},
           cmode: "D2",
-          nogrid: true
+          nogrid: true,
+          'format': format
         });
         raster.change_settings({
           fillStyle: fillStyle
@@ -360,17 +361,19 @@ angular.module('webSCA', [
         //WORKAROUND: take only number of bytes to make one frame
         //back-end will be modified to send only one frame
         var frameSize = $scope.plotSettings.subsize * bpa * ape;
-        //console.log(frameSize + ' bytes extracted');
+        if (data.byteLength < frameSize) {
+          return;
+        }
+        
         data = data.slice(0, frameSize);
         var array = dataConverter(data);//NB the return value toggles between two different length values. Thus the data is sometimes not properly formatted
         lastDataSize = array.length;
-        //console.log(array.length + ' ' + dataType + ' elements plotted');
         if (plot && raster) {
           //WORKAROUND: This check should not be necessary. Every other frame seems to have invalid format
           // apparently containing values that are not of the type specified in dataType
-          //if (array.length !== frameSize / bpa) {
-          //  return;
-          //}
+          if (array.length !== frameSize / bpa) {
+            return;
+          }
           reloadPlots(array);
         }
       };
@@ -380,17 +383,19 @@ angular.module('webSCA', [
           if (useCustomSettings) {
             $scope.plotSettings = $scope.customSettings;
           }
+          console.log("plot subsize: " + $scope.plotSettings.subsize);
           plot.reload(layer, data, $scope.plotSettings);
           plot.refresh();
           plot._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
-          raster.push(layer, data, $scope.plotSettings);
+          console.log("raster subsize: " + $scope.plotSettings.subsize);
+          raster.push(layer2, data, $scope.plotSettings);
           raster.refresh();
           raster._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
           reloadSri = false;
         } else {
           plot.reload(layer, data);
           plot._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
-          raster.push(layer, data);
+          raster.push(layer2, data);
           raster._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
         }
       };
@@ -400,17 +405,17 @@ angular.module('webSCA', [
       var updatePlotSettings = function(data) {
         var isDirty = false;
         angular.forEach(data, function(item, key){
-          if (angular.isDefined($scope.plotSettings[key]) && !angular.equals($scope.plotSettings[key], item) && item != 0) {
+          if (angular.isDefined($scope.plotSettings[key]) && !angular.equals($scope.plotSettings[key], item)) {
             isDirty = true;
             console.log("Plot settings change "+key+": "+$scope.plotSettings[key]+" -> "+item);
             $scope.plotSettings[key] = item;
           }
         });
 
-//        $scope.plotSettings['size'] = lastDataSize * $scope.plotSettings['xdelta'];
-//        if(data['subsize'] == 0) {
-//          $scope.plotSettings['subsize'] = lastDataSize;
-//        }
+        $scope.plotSettings['size'] = lastDataSize * $scope.plotSettings['xdelta'];
+        if(data['subsize'] == 0) {
+          $scope.plotSettings['subsize'] = lastDataSize;
+        }
 
         if (!plot || !raster) {
           var format = undefined;
@@ -425,6 +430,14 @@ angular.module('webSCA', [
           }
 
           if (mode) {
+            angular.extend(defaultSettings,
+              {
+                'xdelta': data.xdelta,
+                'xunits': data.xunits,
+                'ydelta': data.ydelta,
+                'subsize': data.subsize
+              }
+            );
             switch (dataType) {
               case "float":
                 createPlot(mode + "F", defaultSettings);
