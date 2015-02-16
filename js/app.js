@@ -29,7 +29,7 @@ angular.module('webSCA', [
     'webSCADirectives',
     'redhawkDirectives',
     'ngRoute'//,
-//    'ui.bootstrap',
+    //'ui.bootstrap'//,
 //    'hljs'
   ])
   .config(['$routeProvider',
@@ -38,6 +38,10 @@ angular.module('webSCA', [
         .when('/overview', {
           templateUrl: 'views/overview.html',
           controller: 'Overview'
+        })
+        .when('/preferences', {
+          templateUrl: 'views/preferences.html',
+          controller: 'UserSettings'
         })
         .when('/waveforms/:action?', {
           templateUrl: 'views/waveforms.html',
@@ -84,17 +88,55 @@ angular.module('webSCA', [
     };
   })
   .factory('user', ['RedhawkDomain', function(RedhawkDomain){
-      var user = {domain: undefined};
+      var user = {domain: undefined, hosts: [ 'localhost'], domains: [] };
 
-      RedhawkDomain.getDomainIds().$promise.then(function(data){
-        user.domain = data[0];
-      });
-      return user;
+      // Query server with hosts list and update domains, domain
+      user.refreshData = function() {
+        RedhawkDomain.getDomainIds(user.hosts).then(function(data) {
+          user.setData(data);
+        });
+        return this;
+      };
+
+      // Set the domains list, optionally clearing domain if not in domains list
+      user.setData = function(data) {
+        var i, found = false;
+        var firstValid = undefined;
+        this.domains = data;
+
+        // See if domain still exists.  If not, replace
+        for (i = 0; i < data.length; i++) {
+          if (this.domain === data[i].domain) {
+            found = true;
+          }
+          firstValid = firstValid || data[i].domain;
+        }
+        
+        if (!found) {
+          this.domain = firstValid;
+        }
+        return this;
+      };
+      
+      return user.refreshData();
   }])
   .controller('UserSettings', ['$scope', 'user', '$timeout', 'RedhawkDomain',
-    function($scope, user, $timeout, RedhawkDomain){
+    function($scope, user, $timeout, RedhawkDomain) {
       $scope.user = user;
-      $scope.domains = RedhawkDomain.getDomainIds();
+
+      $scope.add_host = function(newhost) {
+        if (newhost) {
+          $scope.user.hosts.push(newhost);
+          $scope.newhost = '';
+          $scope.user.refreshData();
+        };
+      };
+
+      $scope.remove_host = function(index) {
+        $scope.user.hosts.splice(index, 1);
+        $scope.user.refreshData();
+      };
+
     }
   ])
   .controller('Overview', ['$scope', 'RedhawkSocket',  'RedhawkDomain', 'user',

@@ -57,20 +57,42 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
        *
        * @returns {Array.<string>}
        */
-      redhawk.getDomainIds = function(){
-        if(!redhawk.domainIds) {
-          redhawk.domainIds = [];
-
-          redhawk.domainIds.$promise = RedhawkREST.domain.query().$promise.then(function(data){
-            var domains = data['domains'];
-            angular.forEach(domains, function(item){
-              this.push(item);
-            }, redhawk.domainIds);
-            return redhawk.domainIds;
-          });
+      redhawk.getDomainIds = function(hosts){
+        redhawk.domainIds = [];
+        
+        var promises = [];
+        angular.forEach(hosts, function(host) {
+          promises.push(RedhawkREST.domain.query({host: host}).$promise.then(function(data){
+            var domains = [];
+            console.debug("This is the data ", String(data));
+            angular.forEach(data.domains, function(item){
+              console.debug("This is an item ", String(item));
+              this.push({domain: item, host: host});
+            }, domains);
+            console.debug("This is an domains ", String(domains));
+            return domains;
+          }, function(error) {
+            // Return an error to the list of domains
+            var d = {domain: undefined, host: host, error: error.data.message};
+            if (! d.error) {
+              d.error = 'An unknown ' + error.status + ' error.';
+            }
+            return d;
+          }));
+        });
+        console.debug('items '.concat(String(redhawk.domainIds)));
+        if (promises.length) {
+          return $q.all(promises).then(function (data) {
+            var merged = [];
+            merged = merged.concat.apply(merged, data);
+            return merged;
+          })
+        } else {
+          // No data, so just send back an empty list
+          var deferred = $q.defer();
+          deferred.resolve([]);
+          return deferred.promise;
         }
-
-        return redhawk.domainIds;
       };
 
         /**

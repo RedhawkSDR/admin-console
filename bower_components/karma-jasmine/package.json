@@ -1,0 +1,45 @@
+{
+  "name": "karma-jasmine",
+  "version": "0.2.3",
+  "description": "A Karma plugin - adapter for Jasmine testing framework.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/karma-runner/karma-jasmine.git"
+  },
+  "keywords": [
+    "karma-plugin",
+    "karma-adapter",
+    "jasmine"
+  ],
+  "author": "Vojta Jina <vojta.jina@gmail.com>",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6",
+    "karma": "~0.12.0",
+    "karma-jasmine": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.0",
+    "grunt-karma": "~0.8.0",
+    "grunt-auto-release": "~0.0.2",
+    "grunt-npm": "~0.0.2",
+    "grunt-bump": "~0.0.7"
+  },
+  "peerDependencies": {
+    "karma": ">=0.9"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Friedel Ziegelmayer <friedel.ziegelmayer@gmail.com>",
+    "Maksim Ryzhikov <rv.maksim@gmail.com>",
+    "Barry Fitzgerald <barfitzgerald@gmail.com>",
+    "Niels Dequeker <niels.dequeker@gmail.com>",
+    "Robin Gloster <robin@loc-com.de>",
+    "Sergey Tatarintsev <sevinf@yandex-team.ru>",
+    "rpark <objectiv@gmail.com>"
+  ]
+}

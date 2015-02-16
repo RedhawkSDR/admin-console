@@ -18,8 +18,17 @@
     "grunt-contrib-cssmin": "~0.10.0",
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-connect": "~0.5.0",
     "grunt-angular-templates": "~0.5.5",
     "grunt-cli": "~0.1.13",
-    "grunt-injector": "~0.5.4"
-  }
+    "grunt-injector": "~0.5.4",  
+    "grunt-karma": "~0.8.3",
+    "karma": "^0.12.16",
+    "karma-chrome-launcher": "^0.1.4",
+    "karma-jasmine": "^0.1.5",
+    "protractor": "~1.0.0",
+    "http-server": "^0.6.1",
+    "tmp": "0.0.23",
+    "shelljs": "^0.2.6"
+ }
 }

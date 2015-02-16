@@ -128,6 +128,39 @@ module.exports = function(grunt) {
         stripBanners: false,
         banner: myBanner
       }
+    },
+    connect: {
+      options: {
+        port: 9000,
+        // Change this to '0.0.0.0' to access the server from outside.
+        hostname: 'localhost',
+        livereload: 35729
+      },
+      livereload: {
+        options: {
+          open: true,
+          base: '.'
+        }
+      },
+      test: {
+        options: {
+          port: 9001,
+          base: '.'
+        }
+      }, 
+    },
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js',
+        background: false,
+        singleRun: false,
+        autoWatch: true
+      },
+      continuous: {
+        configFile: 'karma.conf.js',
+        singleRun: true,
+        browsers: ['PhantomJS']
+      }
     }
   });
 
@@ -140,7 +173,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-injector');
   grunt.loadNpmTasks('grunt-usemin');
   grunt.loadNpmTasks('grunt-angular-templates');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-karma');
 
   grunt.registerTask('default', ['bower:dev', 'copy:dev', 'injector:vendor', 'injector:deps']);
+  grunt.registerTask('test', ['clean', 'copy:dist', 'bower', 'connect:test', 'karma']);
   grunt.registerTask('dist', ['clean', 'copy:dist', 'bower', 'useminPrepare', 'ngtemplates', 'concat', 'cssmin', 'uglify', 'usemin']);
+
 };
