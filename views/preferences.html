@@ -31,26 +31,28 @@ with this program.  If not, see http://www.gnu.org/licenses/.
                                 <p>Use the following hosts for REDHAWK domain discovery:</p>
                                 <ul class="list-group">
                                     <li class="list-group-item" ng-repeat="host in user.hosts">
-                                        {{host}}
-                                        <span class="badge"><i class="icon-remove-sign"
-                                                               ng-click="remove_host($index)"></i></span>
+                                        {{host}}                                         <i class="pull-right icon-remove-sign"
+                                                                                            ng-click="remove_host($index)"></i>
+                                        <span ng-if="user.hoststatus[host]" class="pull-right label label-danger" tooltip="{{user.hoststatus[host] && user.hoststatus[host].error}}">Error</span>
 
                                     </li>
                                     <div class="alert alert-info" ng-show="!user.hosts.length">Host list is empty</div>
                                 </ul>
+                                <form ng-submit="add_host(newhost)">
                                 <div class="input-group">
-                                    <input class="form-control" ng-model="newhost" placeholder="Hostname/IP Address"></input>
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button" ng-click="add_host(newhost)">Add</button>
-                                    </span>
+                                        <input class="form-control" ng-model="newhost" placeholder="Hostname/IP Address"></input>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button" ng-click="add_host(newhost)">Add</button>
+                                        </span>
                                 </div>
+                                </form>
                                 <p><p></p>
                                 If a domain is missing in the domain selector, it could be caused by:
                                 <ul>
                                     <li>DomainManager not running on host</li>
                                     <li>The CORBA nameService is down</li>
                                     <li>Network connectivity between the web server and the host</li>
-                                    <li>A firewall hiding ports (CORBA has issues with most firewalls)</li>
+                                    <li>A firewall restricting ports (CORBA has issues with most firewalls)</li>
                                 </ul>
                                 </p>
                             </div>

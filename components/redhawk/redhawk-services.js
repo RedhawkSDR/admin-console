@@ -64,12 +64,9 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
         angular.forEach(hosts, function(host) {
           promises.push(RedhawkREST.domain.query({host: host}).$promise.then(function(data){
             var domains = [];
-            console.debug("This is the data ", String(data));
             angular.forEach(data.domains, function(item){
-              console.debug("This is an item ", String(item));
               this.push({domain: item, host: host});
             }, domains);
-            console.debug("This is an domains ", String(domains));
             return domains;
           }, function(error) {
             // Return an error to the list of domains
@@ -80,7 +77,6 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
             return d;
           }));
         });
-        console.debug('items '.concat(String(redhawk.domainIds)));
         if (promises.length) {
           return $q.all(promises).then(function (data) {
             var merged = [];

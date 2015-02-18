@@ -28,8 +28,8 @@ angular.module('webSCA', [
     'redhawkServices',
     'webSCADirectives',
     'redhawkDirectives',
-    'ngRoute'//,
-    //'ui.bootstrap'//,
+    'ngRoute',
+    'ui.bootstrap'//,
 //    'hljs'
   ])
   .config(['$routeProvider',
@@ -88,7 +88,7 @@ angular.module('webSCA', [
     };
   })
   .factory('user', ['RedhawkDomain', function(RedhawkDomain){
-      var user = {domain: undefined, hosts: [ 'localhost'], domains: [] };
+      var user = {domain: undefined, hosts: [ 'localhost'], domains: [], alldomains: [], hoststatus: {}};
 
       // Query server with hosts list and update domains, domain
       user.refreshData = function() {
@@ -102,19 +102,34 @@ angular.module('webSCA', [
       user.setData = function(data) {
         var i, found = false;
         var firstValid = undefined;
-        this.domains = data;
+        var tmpdomains = [];
+        var tmpstatus = {};
+        this.alldomains = data;
 
-        // See if domain still exists.  If not, replace
+        // Filter good domains
         for (i = 0; i < data.length; i++) {
+          firstValid = firstValid || data[i].domain;
+
+          // Filter good domains for domain list
+          if (data[i].domain) {
+            tmpdomains.push(data[i]);
+          } else {
+            tmpstatus[data[i].host] = { error: data[i].error};
+          }
+          
+          // Does existing domain still exists?
           if (this.domain === data[i].domain) {
             found = true;
           }
-          firstValid = firstValid || data[i].domain;
+          
         }
         
-        if (!found) {
+        if (!this.domain || !found) {
           this.domain = firstValid;
         }
+        
+        this.domains = tmpdomains;
+        this.hoststatus = tmpstatus;
         return this;
       };
       

@@ -95,10 +95,18 @@ describe('AdminConsole.webSCA controller', function() {
       expect(scope.user.domains).toEqualData([{domain: 'localhost:REDHAWK_DEV', host: 'localhost'}]);
       $httpBackend.flush();
       expect(scope.newhost).toEqualData('');
-      expect(scope.user.domains).toEqualData([
+      expect(scope.user.alldomains).toEqualData([
         {domain: 'localhost:REDHAWK_DEV', host: 'localhost'},
         {domain: undefined, error: "Unable to connect with NameService on host 'foobar'", host: 'foobar'},
       ]);
+      expect(scope.user.domains).toEqualData([
+        {domain: 'localhost:REDHAWK_DEV', host: 'localhost'}
+      ]);
+      expect(scope.user.hoststatus).toEqualData({
+        foobar: {
+          error: "Unable to connect with NameService on host 'foobar'"
+        }
+      });
 
     });
 
@@ -115,11 +123,14 @@ describe('AdminConsole.webSCA controller', function() {
       expect(scope.user.domains).toEqualData([{domain: 'localhost:REDHAWK_DEV', host: 'localhost'}]);
       $httpBackend.flush();
       expect(scope.newhost).toEqualData('');
-      expect(scope.user.domains).toEqualData([
+      expect(scope.user.alldomains).toEqualData([
         {domain: 'localhost:REDHAWK_DEV', host: 'localhost'},
         {domain: undefined, error: "An unknown 404 error.", host: 'foobar'},
       ]);
-
+      expect(scope.user.domains).toEqualData([
+        {domain: 'localhost:REDHAWK_DEV', host: 'localhost'}
+      ]);
+      expect(scope.user.domain).toEqualData('localhost:REDHAWK_DEV');
     });
 
     it('UserSettings.remove_host()', function() {
@@ -166,7 +177,6 @@ describe('AdminConsole.webSCA controller', function() {
 
 
     it('UserSettings sets default host to first valid host', function() {
-      console.debug(scope.user);
       expect(scope.user.domains).toEqualData([]);
       $httpBackend.flush();
       
@@ -183,7 +193,7 @@ describe('AdminConsole.webSCA controller', function() {
       scope.user.hosts = [ 'foobar', '127.0.0.1', 'whatever'];
       scope.user.refreshData();
       $httpBackend.flush();
-      expect(scope.user.domains).toEqualData([
+      expect(scope.user.alldomains).toEqualData([
         {domain: undefined, error: "Unable to connect with NameService on host 'foobar'", host: 'foobar'},
         {domain: '127.0.0.1:FOOBAR', host: '127.0.0.1'},
         {domain: 'whatever:DOMAIN1', host: 'whatever'},
@@ -191,7 +201,7 @@ describe('AdminConsole.webSCA controller', function() {
       ]);
 
       // Domain should be first valid domain
-      expect(scope.user.domain).toEqualData(scope.user.domains[1].domain);
+      expect(scope.user.domain).toEqualData(scope.user.alldomains[1].domain);
 
       // Remove that domain
       scope.remove_host(1);
@@ -207,7 +217,7 @@ describe('AdminConsole.webSCA controller', function() {
       $httpBackend.flush();
 
       // expect only the one domain and the selected domain should be this one
-      expect(scope.user.domain).toEqualData(scope.user.domains[1].domain)
+      expect(scope.user.domain).toEqualData(scope.user.alldomains[1].domain)
     });
 
     //it('should set the default value of orderProp model', function() {
