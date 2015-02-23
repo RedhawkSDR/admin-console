@@ -245,26 +245,26 @@ angular.module('webSCA', [
 
       var dataType = $routeParams.dataType ? $routeParams.dataType : 'float';
 
-      var defaultSettings = {
+      var defaultOverrides = {
         xdelta:10.25390625,
         xstart: -1,
-        xunits: 3,
         ydelta : 0.09752380952380953,
         ystart: 0,
         yunits: 1,
-        subsize: 0,
-        size: 8192
+        xunits: 3,
+        subsize: -1
       };
-      $scope.plotSettings = angular.copy(defaultSettings);
+      $scope.plotOverrides = angular.copy(defaultOverrides);
 
       $scope.useSRISettings = true;
-      $scope.customSettings = angular.copy(defaultSettings);
+      $scope.customSettings = angular.copy(defaultOverrides);
 
       $scope.$watch('useSRISettings', function(value) {
-        if(plot && raster && value) {
-          $scope.customSettings = angular.copy($scope.plotSettings);
-          reloadSri = true;
+        if(value) {
+          $scope.customSettings = angular.copy($scope.plotOverrides);
         }
+        reloadSri = true;
+        $scope.updateCustomSettings();
       });
 
       var plot, raster, layer, layer2;
@@ -276,54 +276,50 @@ angular.module('webSCA', [
         "rgba(0, 0, 255, 0.7)"
       ];
 
-      var createPlot = function(format, settings) {
+      var createPlot = function(settings, overrides) {
 
-        plot = new sigplot.Plot(document.getElementById("plot"), {
-          all: true,
-          expand: true,
-          autohide_panbars: true,
-          autox: 3,
-          legend: false,
-          xcnt: 0,
-          colors: {bg: "#222", fg: "#888"},
-          cmode: "D2",
-          'format': format
-        });
+        plot = new sigplot.Plot(document.getElementById("plot"),
+          angular.extend(settings,
+            {
+              all: true,
+              expand: true,
+              autohide_panbars: true,
+              autox: 3,
+              legend: false,
+              xcnt: 0,
+              colors: {bg: "#222", fg: "#888"}
+            }));
         plot.change_settings({
           fillStyle: fillStyle
         });
 
-        layer = plot.overlay_array(null, angular.extend(settings, {'format': format}));
+        layer = plot.overlay_array(null, overrides, settings);
       };
 
-      var createRaster = function(format, settings) {
-        raster = new sigplot.Plot(document.getElementById("raster"), {
-          all: true,
-          expand: true,
-          autol: 100,
-          autox: 3,
-          autohide_panbars: true,
-          xcnt: 0,
-          colors: {bg: "#222", fg: "#888"},
-          cmode: "D2",
-          nogrid: true,
-          'format': format
-        });
+      var createRaster = function(settings, overrides) {
+        raster = new sigplot.Plot(document.getElementById("raster"), angular.extend(settings,
+          {
+            all: true,
+            expand: true,
+            autol: 100,
+            autox: 3,
+            autohide_panbars: true,
+            xcnt: 0,
+            colors: {bg: "#222", fg: "#888"},
+            nogrid: true
+          }));
         raster.change_settings({
           fillStyle: fillStyle
         });
-        layer2 = raster.overlay_pipe(angular.extend(settings, {type: 2000, 'format': format, pipe: true, pipesize: 1024 * 1024 * 5}));
+        //layerType defaults to Layer1D with type = 1000, so we set it explicitly to Layer2D
+        layer2 = raster.overlay_pipe(angular.extend(overrides, {'pipe': true, 'pipsesize': 1024 * 1024 * 5}), {layerType: sigplot.Layer2D});
       };
 
       var reloadSri, useCustomSettings;
 
       $scope.updateCustomSettings = function() {
-        if(!$scope.useSRISettings) {
-          useCustomSettings = true;
-          reloadSri = true;
-        } else {
-          useCustomSettings = false;
-        }
+        useCustomSettings = !$scope.useSRISettings;
+        reloadSri = true;
       };
 
       var getDataConverter = (function(){
@@ -376,7 +372,7 @@ angular.module('webSCA', [
       })();
       var dataConverter = getDataConverter(dataType);
 
-      var lastDataSize = 1000;
+      var defaultSubsize = 4096;
 
       var on_data = function(data) {
         var bpa;
@@ -417,18 +413,19 @@ angular.module('webSCA', [
 
         //WORKAROUND: take only number of bytes to make one frame
         //back-end will be modified to send only one frame
-        var frameSize = $scope.plotSettings.subsize * bpa * ape;
-        if (data.byteLength < frameSize) {
-          return;
-        }
-        
+        var frameSize = $scope.plotOverrides.subsize * bpa * ape;
         data = data.slice(0, frameSize);
         var array = dataConverter(data);//NB the return value toggles between two different length values. Thus the data is sometimes not properly formatted
-        lastDataSize = array.length;
+        if (array.length < defaultSubsize) {
+          defaultSubsize = array.length;
+          $scope.plotOverrides.subsize = defaultSubsize;
+          reloadSri = true;
+        }
         if (plot && raster) {
           //WORKAROUND: This check should not be necessary. Every other frame seems to have invalid format
           // apparently containing values that are not of the type specified in dataType
           if (array.length !== frameSize / bpa) {
+            //console.log("array length " + array.length + " not equal to framesize / bpa " + (frameSize / bpa));
             return;
           }
           reloadPlots(array);
@@ -436,42 +433,41 @@ angular.module('webSCA', [
       };
 
       var reloadPlots = function(data) {
+        var overrides;
         if (reloadSri ) {
           if (useCustomSettings) {
-            $scope.plotSettings = $scope.customSettings;
+           overrides = $scope.customSettings;
+          } else {
+            overrides = $scope.plotOverrides;
           }
-          console.log("plot subsize: " + $scope.plotSettings.subsize);
-          plot.reload(layer, data, $scope.plotSettings);
+          plot.reload(layer, data, overrides);
           plot.refresh();
-          plot._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
-          console.log("raster subsize: " + $scope.plotSettings.subsize);
-          raster.push(layer2, data, $scope.plotSettings);
+          raster.push(layer2, data, overrides);
           raster.refresh();
-          raster._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
           reloadSri = false;
         } else {
           plot.reload(layer, data);
-          plot._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
           raster.push(layer2, data);
-          raster._Gx.ylab = 27; //this is a hack, but sigplot seems to be ignoring the settings value
         }
       };
 
-      var mode = undefined;
+      var mode, type = undefined;
 
       var updatePlotSettings = function(data) {
         var isDirty = false;
         angular.forEach(data, function(item, key){
-          if (angular.isDefined($scope.plotSettings[key]) && !angular.equals($scope.plotSettings[key], item)) {
+          if (angular.isDefined($scope.plotOverrides[key]) && !angular.equals($scope.plotOverrides[key], item)) {
             isDirty = true;
-            console.log("Plot settings change "+key+": "+$scope.plotSettings[key]+" -> "+item);
-            $scope.plotSettings[key] = item;
+            console.log("Plot settings change "+key+": "+$scope.plotOverrides[key]+" -> "+item);
+            $scope.plotOverrides[key] = item;
           }
         });
 
-        $scope.plotSettings['size'] = lastDataSize * $scope.plotSettings['xdelta'];
-        if(data['subsize'] == 0) {
-          $scope.plotSettings['subsize'] = lastDataSize;
+        $scope.plotOverrides['size'] = defaultSubsize * $scope.plotOverrides['xdelta'];
+        if(data['subsize'] === 0) {
+          $scope.plotOverrides['subsize'] = defaultSubsize;
+          $scope.plotOverrides['ydelta'] = $scope.plotOverrides.xdelta * defaultSubsize;
+          isDirty = true;
         }
 
         if (!plot || !raster) {
@@ -485,35 +481,56 @@ angular.module('webSCA', [
               break;
             default:
           }
+          
+          var rasterCMode;
+          var type;
+          switch (data.subsize) {
+            case 0:
+              type = 1000;
+              if (mode === "C") {
+                rasterCMode = "MA";
+              } else {
+                rasterCMode = "RE";
+              }
+              break;
+            default:
+              type = 2000;
+              rasterCMode = "D2";
+              break;
+          }
 
           if (mode) {
-            angular.extend(defaultSettings,
-              {
-                'xdelta': data.xdelta,
-                'xunits': data.xunits,
-                'ydelta': data.ydelta,
-                'subsize': data.subsize
-              }
-            );
             switch (dataType) {
               case "float":
-                createPlot(mode + "F", defaultSettings);
-                createRaster(mode + "F", defaultSettings);
+                createPlot({'cmode': "D2"}, angular.extend($scope.plotOverrides, {"format": mode + "F"}));
+                createRaster({'cmode': rasterCMode}, angular.extend($scope.plotOverrides, {
+                    'format': mode + "F",
+                    'type': type,
+                    'ydelta': $scope.plotOverrides.xdelta * $scope.plotOverrides.subsize
+                  })
+                );
                 raster.mimic(plot, {xzoom: true, unzoom: true});
-                console.log("Create plots with format " + mode + "F");
                 break;
               case "double":
-                createPlot(mode + "D", defaultSettings);
-                createRaster(mode + "D",defaultSettings);
+                createPlot({'cmode': "D2"}, angular.extend($scope.plotOverrides, {"format": mode + "D"}));
+                createRaster({'cmode': rasterCMode}, angular.extend($scope.plotOverrides, {
+                    'format': mode + "D",
+                    'type': type,
+                    'ydelta': $scope.plotOverrides.xdelta * $scope.plotOverrides.subsize
+                  })
+                );
                 raster.mimic(plot, {xzoom: true, unzoom: true});
-                console.log("Create plots with format " + mode + "D");
                 break;
               case "short":
               case "octet":
-                createPlot(mode + "B", defaultSettings);
-                createRaster(mode + "B", defaultSettings);
+                createPlot({'cmode': "D2"}, angular.extend($scope.plotOverrides, {"format": mode + "B"}));
+                createRaster({'cmode': rasterCMode}, angular.extend($scope.plotOverrides, {
+                    'format': mode + "B",
+                    'type': type,
+                    'ydelta': $scope.plotOverrides.xdelta * $scope.plotOverrides.subsize
+                  })
+                );
                 raster.mimic(plot, {xzoom: true, unzoom: true});
-                console.log("Create plots with format " + mode + "D");
                 break;
               default:
             }
@@ -523,7 +540,7 @@ angular.module('webSCA', [
 
         if(isDirty && $scope.useSRISettings) {
           reloadSri = true;
-          $scope.customSettings = angular.copy($scope.plotSettings);
+          $scope.customSettings = angular.copy($scope.plotOverrides);
         }
       };
 
