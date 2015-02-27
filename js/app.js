@@ -24,14 +24,14 @@
  */
 
 angular.module('webSCA', [
-    'webSCAConfig',
-    'redhawkServices',
-    'webSCADirectives',
-    'redhawkDirectives',
-    'ngRoute',
-    'ui.bootstrap'//,
+  'webSCAConfig',
+  'redhawkServices',
+  'webSCADirectives',
+  'redhawkDirectives',
+  'ngRoute',
+  'ui.bootstrap'//,
 //    'hljs'
-  ])
+])
   .config(['$routeProvider',
     function($routeProvider) {
       $routeProvider
@@ -64,7 +64,7 @@ angular.module('webSCA', [
           controller: 'Plot'
         })
         .otherwise({
-                redirectTo: '/overview'
+          redirectTo: '/overview'
         });
     }
   ])
@@ -88,52 +88,52 @@ angular.module('webSCA', [
     };
   })
   .factory('user', ['RedhawkDomain', function(RedhawkDomain){
-      var user = {domain: undefined, hosts: [ 'localhost'], domains: [], alldomains: [], hoststatus: {}};
+    var user = {domain: undefined, hosts: [ 'localhost'], domains: [], alldomains: [], hoststatus: {}};
 
-      // Query server with hosts list and update domains, domain
-      user.refreshData = function() {
-        RedhawkDomain.getDomainIds(user.hosts).then(function(data) {
-          user.setData(data);
-        });
-        return this;
-      };
+    // Query server with hosts list and update domains, domain
+    user.refreshData = function() {
+      RedhawkDomain.getDomainIds(user.hosts).then(function(data) {
+        user.setData(data);
+      });
+      return this;
+    };
 
-      // Set the domains list, optionally clearing domain if not in domains list
-      user.setData = function(data) {
-        var i, found = false;
-        var firstValid = undefined;
-        var tmpdomains = [];
-        var tmpstatus = {};
-        this.alldomains = data;
+    // Set the domains list, optionally clearing domain if not in domains list
+    user.setData = function(data) {
+      var i, found = false;
+      var firstValid = undefined;
+      var tmpdomains = [];
+      var tmpstatus = {};
+      this.alldomains = data;
 
-        // Filter good domains
-        for (i = 0; i < data.length; i++) {
-          firstValid = firstValid || data[i].domain;
+      // Filter good domains
+      for (i = 0; i < data.length; i++) {
+        firstValid = firstValid || data[i].domain;
 
-          // Filter good domains for domain list
-          if (data[i].domain) {
-            tmpdomains.push(data[i]);
-          } else {
-            tmpstatus[data[i].host] = { error: data[i].error};
-          }
-          
-          // Does existing domain still exists?
-          if (this.domain === data[i].domain) {
-            found = true;
-          }
-          
+        // Filter good domains for domain list
+        if (data[i].domain) {
+          tmpdomains.push(data[i]);
+        } else {
+          tmpstatus[data[i].host] = { error: data[i].error};
         }
-        
-        if (!this.domain || !found) {
-          this.domain = firstValid;
+
+        // Does existing domain still exists?
+        if (this.domain === data[i].domain) {
+          found = true;
         }
-        
-        this.domains = tmpdomains;
-        this.hoststatus = tmpstatus;
-        return this;
-      };
-      
-      return user.refreshData();
+
+      }
+
+      if (!this.domain || !found) {
+        this.domain = firstValid;
+      }
+
+      this.domains = tmpdomains;
+      this.hoststatus = tmpstatus;
+      return this;
+    };
+
+    return user.refreshData();
   }])
   .controller('UserSettings', ['$scope', 'user', '$timeout', 'RedhawkDomain',
     function($scope, user, $timeout, RedhawkDomain) {
@@ -246,15 +246,19 @@ angular.module('webSCA', [
       var dataType = $routeParams.dataType ? $routeParams.dataType : 'float';
 
       var defaultOverrides = {
-        xdelta:10.25390625,
-        xstart: -1,
-        ydelta : 0.09752380952380953,
+        xdelta: 0,
+        xstart: 0,
+        ydelta: 0,
         ystart: 0,
-        yunits: 1,
-        xunits: 3,
-        subsize: -1
+        yunits: 0,
+        xunits: 1,
+        subsize: 4096
       };
       $scope.plotOverrides = angular.copy(defaultOverrides);
+      console.log("plotOverrides initial values");
+      angular.forEach($scope.plotOverrides, function(value, key) {
+        console.log(key + " " + value);
+      });
 
       $scope.useSRISettings = true;
       $scope.customSettings = angular.copy(defaultOverrides);
@@ -267,7 +271,7 @@ angular.module('webSCA', [
         $scope.updateCustomSettings();
       });
 
-      var plot, raster, layer, layer2;
+      var plot = null, raster = null, layer = undefined, layer2 = undefined;;
 
       var fillStyle = [
         "rgba(255, 255, 100, 0.7)",
@@ -276,44 +280,60 @@ angular.module('webSCA', [
         "rgba(0, 0, 255, 0.7)"
       ];
 
-      var createPlot = function(settings, overrides) {
+      var createPlot = function(settings) {
 
         plot = new sigplot.Plot(document.getElementById("plot"),
           angular.extend(settings,
             {
-              all: true,
               expand: true,
+              autol: 5,
               autohide_panbars: true,
               autox: 3,
               legend: false,
               xcnt: 0,
+              cmode: "MA",
               colors: {bg: "#222", fg: "#888"}
             }));
         plot.change_settings({
           fillStyle: fillStyle
         });
-
-        layer = plot.overlay_array(null, overrides, settings);
+      };
+      
+      var overlayPlot = function(overrides, options) {
+        options = options || {};
+        console.log("***** OVERLAY ARRAY *****")
+        layer = plot.overlay_array(null, overrides, options);
       };
 
-      var createRaster = function(settings, overrides) {
+      createPlot({});
+
+      var createRaster = function(settings) {
         raster = new sigplot.Plot(document.getElementById("raster"), angular.extend(settings,
           {
-            all: true,
             expand: true,
-            autol: 100,
+            autol: 5,
             autox: 3,
             autohide_panbars: true,
             xcnt: 0,
             colors: {bg: "#222", fg: "#888"},
-            nogrid: true
+            nogrid: true,
+            'cmode': "D2"
           }));
         raster.change_settings({
           fillStyle: fillStyle
         });
-        //layerType defaults to Layer1D with type = 1000, so we set it explicitly to Layer2D
-        layer2 = raster.overlay_pipe(angular.extend(overrides, {'pipe': true, 'pipsesize': 1024 * 1024 * 5}), {layerType: sigplot.Layer2D});
       };
+
+      var overlayRaster = function(overrides) {
+        //layerType defaults to Layer1D with type = 1000, so we set it explicitly to Layer2D
+        var overridesCopy = angular.copy(overrides);
+        layer2 = raster.overlay_pipe(angular.extend(overridesCopy, {'pipe': true, 'pipsesize': 1024 * 1024 * 5}), {layerType: sigplot.Layer2D});
+      };
+
+      createRaster({});
+
+      raster.mimic(plot, {xzoom: true, unzoom: true, xpan: true});
+      plot.mimic(raster, {xzoom: true, unzoom: true, xpan: true});
 
       var reloadSri, useCustomSettings;
 
@@ -372,9 +392,10 @@ angular.module('webSCA', [
       })();
       var dataConverter = getDataConverter(dataType);
 
-      var defaultSubsize = 4096;
+      var defaultSubsize = 1024;
 
       var on_data = function(data) {
+
         var bpa;
         switch (dataType) {
           case 'double':
@@ -434,12 +455,22 @@ angular.module('webSCA', [
 
       var reloadPlots = function(data) {
         var overrides;
-        if (reloadSri ) {
-          if (useCustomSettings) {
-           overrides = $scope.customSettings;
-          } else {
-            overrides = $scope.plotOverrides;
-          }
+        
+        if (useCustomSettings) {
+          overrides = $scope.customSettings;
+        } else {
+          overrides = $scope.plotOverrides;
+        }
+        
+        if (layer === undefined) {
+          overlayPlot(overrides);
+        }
+        
+        if (layer2 === undefined) {
+          overlayRaster(overrides);
+        }
+        
+        if (reloadSri) {
           plot.reload(layer, data, overrides);
           plot.refresh();
           raster.push(layer2, data, overrides);
@@ -451,7 +482,9 @@ angular.module('webSCA', [
         }
       };
 
-      var mode, type = undefined;
+      var mode = '';
+
+      //var firstSriReceived = false;
 
       var updatePlotSettings = function(data) {
         var isDirty = false;
@@ -463,104 +496,73 @@ angular.module('webSCA', [
           }
         });
 
-        $scope.plotOverrides['size'] = defaultSubsize * $scope.plotOverrides['xdelta'];
         if(data['subsize'] === 0) {
           $scope.plotOverrides['subsize'] = defaultSubsize;
           $scope.plotOverrides['ydelta'] = $scope.plotOverrides.xdelta * defaultSubsize;
-          isDirty = true;
+          
+        }
+        $scope.plotOverrides['type'] = 1000;
+        $scope.plotOverrides['size'] = 1;
+        
+
+        var format = '';
+        switch (data.mode) {
+          case 0:
+            mode = "S";
+            break;
+          case 1:
+            mode = "C";
+            break;
+          default:
+            mode = "S";
         }
 
-        if (!plot || !raster) {
-          var format = undefined;
-          switch (data.mode) {
-            case 0:
-              mode = "S";
-              break;
-            case 1:
-              mode = "C";
-              break;
-            default:
-          }
-          
-          var rasterCMode;
-          var type;
-          switch (data.subsize) {
-            case 0:
-              type = 1000;
-              if (mode === "C") {
-                rasterCMode = "MA";
-              } else {
-                rasterCMode = "RE";
-              }
-              break;
-            default:
-              type = 2000;
-              rasterCMode = "D2";
-              break;
-          }
+        switch (dataType) {
+          case 'float':
+            format = mode + "F";
+            break;
+          case 'double':
+            format = mode + "D";
+            break;
+          case "short":
+          case "octet":
+            format = mode + "B";
+            break;
+          default:
+            format = mode + "F";
+        }
 
-          if (mode) {
-            switch (dataType) {
-              case "float":
-                createPlot({'cmode': "D2"}, angular.extend($scope.plotOverrides, {"format": mode + "F"}));
-                createRaster({'cmode': rasterCMode}, angular.extend($scope.plotOverrides, {
-                    'format': mode + "F",
-                    'type': type,
-                    'ydelta': $scope.plotOverrides.xdelta * $scope.plotOverrides.subsize
-                  })
-                );
-                raster.mimic(plot, {xzoom: true, unzoom: true});
-                break;
-              case "double":
-                createPlot({'cmode': "D2"}, angular.extend($scope.plotOverrides, {"format": mode + "D"}));
-                createRaster({'cmode': rasterCMode}, angular.extend($scope.plotOverrides, {
-                    'format': mode + "D",
-                    'type': type,
-                    'ydelta': $scope.plotOverrides.xdelta * $scope.plotOverrides.subsize
-                  })
-                );
-                raster.mimic(plot, {xzoom: true, unzoom: true});
-                break;
-              case "short":
-              case "octet":
-                createPlot({'cmode': "D2"}, angular.extend($scope.plotOverrides, {"format": mode + "B"}));
-                createRaster({'cmode': rasterCMode}, angular.extend($scope.plotOverrides, {
-                    'format': mode + "B",
-                    'type': type,
-                    'ydelta': $scope.plotOverrides.xdelta * $scope.plotOverrides.subsize
-                  })
-                );
-                raster.mimic(plot, {xzoom: true, unzoom: true});
-                break;
-              default:
-            }
-            isDirty = true;
-          }
+        if ($scope.plotOverrides.format !== format) {
+          $scope.plotOverrides.format = format;
+          isDirty = true;
         }
 
         if(isDirty && $scope.useSRISettings) {
           reloadSri = true;
           $scope.customSettings = angular.copy($scope.plotOverrides);
         }
+        
+        //if (!firstSriReceived) {
+        //  overlayPlot($scope.plotOverrides);
+        //  overlayRaster($scope.plotOverrides);
+        //  firstSriReceived = true;
+        //}
+        
       };
 
       var sriData = {};
-//      var keysFound=[];
+
       var on_sri = function(sri) {
+
         if (typeof sri === 'string') {
           return;
         }
+
         updatePlotSettings(sri);
-        angular.forEach(sri, function(value, key){
-//          var found = keysFound.some(function(k) {
-//            return k == key;
-//          });
-//          if (!found) {
-//            console.log("SRI: " + key + " = " + JSON.stringify(value));
-//            keysFound.push(key);
-//          }
+        angular.forEach(sri, function(value, key) {
           if(angular.isArray(value)) {
-            sriData[key] = value.join(", "); }
+            sriData[key] = value.join(", ");
+          }
           else if (angular.isObject(value) && typeof value !== 'string') {
             var str = [];
             angular.forEach(value, function(value, key) {
@@ -576,9 +578,9 @@ angular.module('webSCA', [
       };
 
       $scope.port = RedhawkSocket.port(
-          {domain: user.domain, waveform: $scope.waveformId, component: $scope.componentId, port: $scope.name},
-          on_data,
-          on_sri
+        {domain: user.domain, waveform: $scope.waveformId, component: $scope.componentId, port: $scope.name},
+        on_data,
+        on_sri
       );
 
       $scope.$on("$destroy", function(){
