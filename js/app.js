@@ -301,8 +301,8 @@ angular.module('webSCA', [
       
       var overlayPlot = function(overrides, options) {
         options = options || {};
-        console.log("***** OVERLAY ARRAY *****")
-        layer = plot.overlay_array(null, overrides, options);
+        var optionsCopy = angular.extend(options, {layerType: sigplot.Layer1D});
+        layer = plot.overlay_array(null, overrides, optionsCopy);
       };
 
       createPlot({});
@@ -484,8 +484,6 @@ angular.module('webSCA', [
 
       var mode = '';
 
-      //var firstSriReceived = false;
-
       var updatePlotSettings = function(data) {
         var isDirty = false;
         angular.forEach(data, function(item, key){
@@ -501,7 +499,7 @@ angular.module('webSCA', [
           $scope.plotOverrides['ydelta'] = $scope.plotOverrides.xdelta * defaultSubsize;
           
         }
-        $scope.plotOverrides['type'] = 1000;
+        $scope.plotOverrides['type'] = 2000;
         $scope.plotOverrides['size'] = 1;
         
 
@@ -541,13 +539,7 @@ angular.module('webSCA', [
           reloadSri = true;
           $scope.customSettings = angular.copy($scope.plotOverrides);
         }
-        
-        //if (!firstSriReceived) {
-        //  overlayPlot($scope.plotOverrides);
-        //  overlayRaster($scope.plotOverrides);
-        //  firstSriReceived = true;
-        //}
-        
+
       };
 
       var sriData = {};
