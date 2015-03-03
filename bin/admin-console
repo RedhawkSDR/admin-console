@@ -1,0 +1,69 @@
+#!/bin/sh
+
+mydir=`/usr/bin/dirname "$0"` || exit $?
+mydir=`cd "$mydir" && pwd` || exit $?
+topdir=`cd $mydir/.. && pwd` || exit $?
+
+# defaults
+REDHAWK_WEB=${REDHAWK_WEB:-/var/redhawk/web}
+restpath="${REDHAWK_WEB}/rest-python"
+debug=
+port=8888
+
+
+# functions
+err() {
+   echo "ERROR: $@"
+   exit 1
+}
+
+usage() {
+    cat <<EOFEOF
+Usage: $0 [options]
+
+   Options:
+    -p PORT,--port PORT  The port in which to listen.  Default 8888
+    -d,--debug           Enable Python rest debug
+    --rest-path PATH     Path to REDHAWK RESTful server.  Default /var/redhawk/web/rest-python
+    -h,--help            Show this help
+EOFEOF
+}
+
+
+# -- START OF SCRIPT --
+
+# parse command line
+TEMP=`/usr/bin/getopt -o p:dh --long port:,debug,rest-path:,help -- "$@"`
+[ $? != 0 ] && usage && err "Exiting ..."
+eval set -- "$TEMP"
+while true ; do
+   case "$1" in
+      -h|--help) usage; exit 0;;
+      -d|--debug) debug=true; shift 1 ;;
+      -p|--port) port="$2"; shift 2 ;;
+      --rest-path) restpath="$2"; shift 2;;
+      --) shift 1; break;;
+      *) err "Program err. Args '$@'";;
+   esac
+done
+
+
+
+# Verify pyrest.py exists
+pyrest="$restpath/pyrest.py"
+[ -e "$pyrest" ] || err "Missing python web server '$pyrest'"
+
+# Developer mode check.  If there is a python virtualenv established, use that
+# This permits developers to run without official installation
+if [ -x "$restpath/.virtualenv/bin/python" ] ; then
+    pythonprog="$restpath/.virtualenv/bin/python"
+else
+    # no virtualenv.  Use RHWEB python instance
+    pythonprog="/usr/bin/python"
+    pythonver=`/usr/bin/python -c 'import sys; print "python%s.%s" % sys.version_info[:2]'`
+    PYTHONPATH="$PYTHONPATH:$REDHAWK_WEB/lib/$pythonver/site-packages:$REDHAWK_WEB/lib64/$pythonver/site-packages"
+fi
+
+# Execute the REDHAWK Python REST server serving up the admin console 
+(sleep 1 && gnome-open http://localhost:$port/)
+"$pythonprog"  "$pyrest" --staticpath="$topdir" ${debug:+--logging=debug} ${port:+--port=$port}

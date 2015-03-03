@@ -18,7 +18,8 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 %define _prefix /var/redhawk/web
-%define _client %{_prefix}/admin-console
+%define _admindir %{_prefix}/admin-console
+%define _client %{_admindir}/html
 %define _nginx /etc/nginx/conf.d/redhawk-sites
 
 %define bower node_modules/bower/bin/bower
@@ -26,8 +27,8 @@
 
 Prefix:         %{_prefix}
 Name:		redhawk-admin-console
-Version:	2.0.0
-Release:	1%{?dist}
+Version:	2.0.1
+Release:	0%{?dist}
 Summary:	The REDHAWK Web Baseline used for web applications
 
 License:	GPL
@@ -36,7 +37,7 @@ Source0:        %{name}-%{version}.tar.gz
 
 Requires:       redhawk >= 1.10.2
 Requires:       redhawk-web
-Requires:       redhawk-rest-python >= 2.0.0
+Requires:       redhawk-rest-python >= 2.1.1
 BuildRequires:  npm
 BuildRequires:  git
 
@@ -56,8 +57,11 @@ BuildRequires:  git
 npm install
 %{grunt} dist
 
-mkdir -p $RPM_BUILD_ROOT%{_prefix}
+mkdir -p $RPM_BUILD_ROOT%{_client}
+mkdir -p $RPM_BUILD_ROOT%{_console}/bin
+
 cp -R dist $RPM_BUILD_ROOT%{_client}
+install -T -m 555 bin/admin-console $RPM_BUILD_ROOT%{_admindir}/bin/admin-console
 
 mkdir -p $RPM_BUILD_ROOT/etc/nginx/conf.d/redhawk-sites
 cp deploy/admin-console-nginx.conf $RPM_BUILD_ROOT%{_nginx}/redhawk-admin-console.enabled
@@ -68,6 +72,8 @@ rm -rf %{buildroot}
 %files
 %defattr(-,redhawk,redhawk,-)
 %dir %{_client}
+%dir %{_admindir}/bin
+%{_admindir}/bin/admin-console
 %{_client}/index.html
 %{_client}/css
 %{_client}/images
@@ -82,6 +88,8 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Mar 3  2015 Douglas Pew <douglas.pew@axiosengineering.com> - 2.0.1-0
+- Added standalone web server.
 * Mon Feb 9 2015 Youssef Bagoulla <youssef.bagoulla@axiosengineering.com> - 2.0.0-1
 - Allowing flag for custom npm server, removing bower install since bower components are tracked.
 
