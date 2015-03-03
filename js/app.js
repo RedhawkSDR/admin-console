@@ -132,24 +132,25 @@ angular.module('webSCA', [
         if (data[i].domain) {
           tmpdomains.push(data[i]);
         } else {
-          tmpstatus[data[i].host] = { error: data[i].error};
+          tmpstatus[data[i].host] = {error: data[i].error};
         }
 
         // Does existing domain still exists?
         if (this.domain === data[i].domain) {
           found = true;
         }
-
-        if (!this.domain || !found) {
-          this.domain = firstValid;
-        }
-
-        this.domains = tmpdomains;
-        this.hoststatus = tmpstatus;
-        return this;
       };
+
+      if (!this.domain || !found) {
+        this.domain = firstValid;
+      }
+
+      this.domains = tmpdomains;
+      this.hoststatus = tmpstatus;
+      return this;
+    };
       
-      return user;
+    return user;
   }])
   .controller('UserSettings', ['$scope', 'user', '$timeout', 'RedhawkDomain',
     function($scope, user, $timeout, RedhawkDomain) {
