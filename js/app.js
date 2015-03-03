@@ -87,16 +87,34 @@ angular.module('webSCA', [
       return items.slice(0, num);
     };
   })
-  .factory('user', ['RedhawkDomain', function(RedhawkDomain){
-    var user = {domain: undefined, hosts: [ 'localhost'], domains: [], alldomains: [], hoststatus: {}};
-
-    // Query server with hosts list and update domains, domain
-    user.refreshData = function() {
-      RedhawkDomain.getDomainIds(user.hosts).then(function(data) {
-        user.setData(data);
+  .factory('user', ['RedhawkDomain', 'RedhawkSysinfo',  function(RedhawkDomain, RedhawkSysinfo){
+      var user = { 
+        domain: undefined, 
+        hosts: [ 'localhost'], 
+        domains: [], 
+        alldomains: [], 
+        hoststatus: {},
+        sysinfo: {}
+      };
+      
+      // Update sys info
+      RedhawkSysinfo().then(function(data) {
+        console.debug("Got sysinfo data " , data);
+        user.sysinfo = data;
+        user.refreshData();
+      }, function(err) {
+        console.warn("No sysinfo data ", err);
+        user.refreshData();
       });
-      return this;
-    };
+
+      // Query server with hosts list and update domains, domain
+      user.refreshData = function() {
+        console.debug("Refreshing locations");
+        RedhawkDomain.getDomainIds(user.hosts, user.sysinfo.supportsRemoteLocations).then(function(data) {
+          user.setData(data);
+        });
+        return this;
+      };
 
     // Set the domains list, optionally clearing domain if not in domains list
     user.setData = function(data) {
@@ -122,18 +140,16 @@ angular.module('webSCA', [
           found = true;
         }
 
-      }
+        if (!this.domain || !found) {
+          this.domain = firstValid;
+        }
 
-      if (!this.domain || !found) {
-        this.domain = firstValid;
-      }
-
-      this.domains = tmpdomains;
-      this.hoststatus = tmpstatus;
-      return this;
-    };
-
-    return user.refreshData();
+        this.domains = tmpdomains;
+        this.hoststatus = tmpstatus;
+        return this;
+      };
+      
+      return user;
   }])
   .controller('UserSettings', ['$scope', 'user', '$timeout', 'RedhawkDomain',
     function($scope, user, $timeout, RedhawkDomain) {

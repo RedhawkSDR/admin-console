@@ -29,6 +29,12 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
         }
       });
     }])
+    .factory('RedhawkSysinfo', ['RedhawkREST',
+      function(RedhawkREST) {
+        return function sysinfoFactory() {
+          return RedhawkREST.sysinfo.query().$promise;
+        };
+      }])
     .factory('RedhawkDomain', ['RedhawkREST', 'RedhawkSocket', 'RedhawkNotificationService', '$q',
       function(RedhawkREST, RedhawkSocket, RedhawkNotificationService, $q){
       var notify = RedhawkNotificationService;
@@ -57,12 +63,16 @@ angular.module('redhawkServices', ['webSCAConfig', 'SubscriptionSocketService', 
        *
        * @returns {Array.<string>}
        */
-      redhawk.getDomainIds = function(hosts){
+      redhawk.getDomainIds = function(hosts, locationFlag){
         redhawk.domainIds = [];
         
         var promises = [];
         angular.forEach(hosts, function(host) {
-          promises.push(RedhawkREST.domain.query({host: host}).$promise.then(function(data){
+          
+          var queryResult = locationFlag ? RedhawkREST.domain.queryLocation({host: host}) 
+                                         : RedhawkREST.domain.query();
+          
+          promises.push(queryResult.$promise.then(function(data){
             var domains = [];
             angular.forEach(data.domains, function(item){
               this.push({domain: item, host: host});

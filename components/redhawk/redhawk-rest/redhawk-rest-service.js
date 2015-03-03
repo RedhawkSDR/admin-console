@@ -19,8 +19,12 @@
  */
 angular.module('RedhawkREST', ['ngResource', 'RedhawkConfig'])
   .service('RedhawkREST', ['$resource', 'RedhawkConfig', function($resource, RedhawkConfig) {
+    this.sysinfo = $resource(RedhawkConfig.restUrl + '/sysinfo', {}, {
+      query: {method: 'GET'}
+    });
     this.domain = $resource(RedhawkConfig.restUrl + '/domains', {}, {
-      query: {method: 'GET', url: RedhawkConfig.restUrl + '/domains/:host\\:'},
+      queryLocation: {method: 'GET', url: RedhawkConfig.restUrl + '/domains/:host\\:'},
+      query: {method: 'GET', url: RedhawkConfig.restUrl + '/domains'},
       add: {method: 'POST'},
       info: {method: 'GET', url: RedhawkConfig.restUrl + '/domains/:domainId'},
       configure: {method: 'PUT', url: RedhawkConfig.restUrl + '/domains/:domainId/configure'},

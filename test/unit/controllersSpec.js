@@ -12,13 +12,69 @@ describe('AdminConsole.webSCA controller', function() {
   });
 
   beforeEach(module('webSCA'));
+    describe('WebSCACtrlInit', function() {
+      var scope, ctrl, $httpBackend, $rootScope;
+      
+      beforeEach(inject(function(_$httpBackend_, _$rootScope_, $controller) {
+        $httpBackend = _$httpBackend_;
+        $rootScope = _$rootScope_;
+        scope = $rootScope.$new();
+        ctrl = $controller('UserSettings', {$scope: scope});
+      }));
+      
+      it('UserSettings queries sysinit', function() {
+        $httpBackend.expectGET('/redhawk/rest/sysinfo').
+            respond({
+              'redhawk.version': '1.10.1',
+              'rhweb.version': '1.2',
+              'supportsRemoteLocations': true
+            });
+        $httpBackend.expectGET('/redhawk/rest/domains/localhost:').
+            respond({"domains": ["localhost:REDHAWK_DEV"]});
 
-  describe('WebSCACtrl', function(){
+        expect(scope.user.sysinfo.supportsRemoteLocations).toBeFalsy();
+        expect(scope.user.sysinfo['redhawk.version']).toBeUndefined();
+        expect(scope.user.sysinfo['rhweb.version']).toBeUndefined();
+        $httpBackend.flush();
+        //  Show that the sysinfo data is set
+        expect(scope.user.sysinfo.supportsRemoteLocations).toBeTruthy();
+        expect(scope.user.sysinfo['redhawk.version']).toEqualData('1.10.1');
+        expect(scope.user.sysinfo['rhweb.version']).toEqualData('1.2');
+
+      });
+
+      it('UserSettings bad sysinit works', function() {
+        
+        // Simulate bad sysinfo
+        $httpBackend.expectGET('/redhawk/rest/sysinfo').
+            respond(404, '<html><body>404 Error</body></html>');
+        $httpBackend.expectGET('/redhawk/rest/domains').
+            respond({"domains": ["REDHAWK_DEV"]});
+
+        // Show that the system still works, and that supportsRemoteLocations remains falsy
+        expect(scope.user.sysinfo.supportsRemoteLocations).toBeFalsy();
+        expect(scope.user.sysinfo['redhawk.version']).toBeUndefined();
+        expect(scope.user.sysinfo['rhweb.version']).toBeUndefined();
+        $httpBackend.flush();
+        expect(scope.user.sysinfo.supportsRemoteLocations).toBeFalsy();
+        expect(scope.user.sysinfo['redhawk.version']).toBeUndefined();
+        expect(scope.user.sysinfo['rhweb.version']).toBeUndefined();
+
+      });
+    });
+  
+    describe('WebSCACtrl', function(){
     var scope, ctrl, $httpBackend, $rootScope;
 
     beforeEach(inject(function(_$httpBackend_, _$rootScope_, $controller) {
       $httpBackend = _$httpBackend_;
       $rootScope = _$rootScope_;
+      $httpBackend.expectGET('/redhawk/rest/sysinfo').
+          respond({
+              'redhawk.version': '1.10.1',
+              'rhweb.version': '1.2',
+              'supportsRemoteLocations': true
+          });
       $httpBackend.expectGET('/redhawk/rest/domains/localhost:').
           respond({"domains": ["localhost:REDHAWK_DEV"]});
       
@@ -26,6 +82,18 @@ describe('AdminConsole.webSCA controller', function() {
       ctrl = $controller('UserSettings', {$scope: scope});
     }));
 
+
+    it('UserSettings determines remote location availability', function() {
+      console.debug(scope.user);
+      expect(scope.user.domains).toEqualData([]);
+      $httpBackend.flush();
+      console.debug(scope.user);
+      expect(scope.user.domains).toEqualData([{domain: 'localhost:REDHAWK_DEV', host: 'localhost'}]);
+      expect(scope.user.domain).toEqualData('localhost:REDHAWK_DEV');
+
+      //expect(scope.phones).toEqualData(
+      //    [{name: 'Nexus S'}, {name: 'Motorola DROID'}]);
+    });
 
     it('UserSettings initializes with a list of locations', function() {
       console.debug(scope.user);
