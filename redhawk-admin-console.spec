@@ -61,7 +61,7 @@ mkdir -p $RPM_BUILD_ROOT%{_client}
 mkdir -p $RPM_BUILD_ROOT%{_console}/bin
 
 cp -R dist $RPM_BUILD_ROOT%{_client}
-install -T -m 555 bin/admin-console $RPM_BUILD_ROOT%{_admindir}/bin/admin-console
+install -T -m 555 bin/admin-console $RPM_BUILD_ROOT%{_admindir}/bin
 
 mkdir -p $RPM_BUILD_ROOT/etc/nginx/conf.d/redhawk-sites
 cp deploy/admin-console-nginx.conf $RPM_BUILD_ROOT%{_nginx}/redhawk-admin-console.enabled
