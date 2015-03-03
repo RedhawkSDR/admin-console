@@ -28,7 +28,7 @@
 Prefix:         %{_prefix}
 Name:		redhawk-admin-console
 Version:	2.0.1
-Release:	0%{?dist}
+Release:	1%{?dist}
 Summary:	The REDHAWK Web Baseline used for web applications
 
 License:	GPL
