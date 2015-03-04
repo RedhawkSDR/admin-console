@@ -64,6 +64,12 @@ else
     PYTHONPATH="$PYTHONPATH:$REDHAWK_WEB/lib/$pythonver/site-packages:$REDHAWK_WEB/lib64/$pythonver/site-packages"
 fi
 
+# Determine Admin Console HTML Directory (root directory for development, html directory for production)
+htmldir="$topdir"
+if [ -d "$topdir/html" ] ; then
+   htmldir="$topdir/html"     
+fi
+
 # Execute the REDHAWK Python REST server serving up the admin console 
 (sleep 1 && gnome-open http://localhost:$port/)
-"$pythonprog"  "$pyrest" --staticpath="$topdir" ${debug:+--logging=debug} ${port:+--port=$port}
+"$pythonprog"  "$pyrest" --staticpath="$htmldir" ${debug:+--logging=debug} ${port:+--port=$port}
