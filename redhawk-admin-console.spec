@@ -36,7 +36,6 @@ BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 Source0:        %{name}-%{version}.tar.gz
 
 Requires:       redhawk >= 1.10
-Requires:       redhawk-web
 Requires:       redhawk-rest-python >= 2.1.1
 BuildRequires:  npm
 BuildRequires:  git
