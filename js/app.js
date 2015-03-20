@@ -183,7 +183,7 @@ angular.module('webSCA', [
                         RedhawkNotificationService.error('No Remote Hosts Specified: Please add a host');
                         $location.path('/preferences');
                     } else {
-                        RedhawkNotificationService.info('No domains found on any of the registered hosts');
+                        RedhawkNotificationService.info('No domains found on any of the configured hosts');
                     }
                 }
             });
@@ -216,7 +216,7 @@ angular.module('webSCA', [
                         RedhawkNotificationService.error('No Remote Hosts Specified: Please add a host');
                         $location.path('/preferences');
                     } else {
-                        RedhawkNotificationService.info('No domains found on any of the registered hosts');
+                        RedhawkNotificationService.info('No domains found on any of the configured hosts');
                     }
                 }
             });
@@ -256,7 +256,7 @@ angular.module('webSCA', [
                         RedhawkNotificationService.error('No Remote Hosts Specified: Please add a host');
                         $location.path('/preferences');
                     } else {
-                        RedhawkNotificationService.info('No domains found on any of the registered hosts');
+                        RedhawkNotificationService.info('No domains found on any of the configured hosts');
                     }
                 }
             });
@@ -290,7 +290,7 @@ angular.module('webSCA', [
                         RedhawkNotificationService.error('No Remote Hosts Specified: Please add a host');
                         $location.path('/preferences');
                     } else {
-                        RedhawkNotificationService.info('No domains found on any of the registered hosts');
+                        RedhawkNotificationService.info('No domains found on any of the configured hosts');
                     }
                 }
             });
