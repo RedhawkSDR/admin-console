@@ -174,8 +174,19 @@ angular.module('webSCA', [
 
         }
     ])
-    .controller('Overview', ['$scope', 'RedhawkSocket',  'RedhawkDomain', 'user',
-        function($scope, RedhawkSocket, RedhawkDomain, user) {
+    .controller('Overview', ['$scope', 'RedhawkSocket',  'RedhawkDomain', 'user', '$location', 'RedhawkNotificationService',
+        function($scope, RedhawkSocket, RedhawkDomain, user, $location, RedhawkNotificationService) {
+
+            user.refreshData().then(function() {
+                if (user.domains.length == 0) {
+                    if (user.hosts.length == 0) {
+                        RedhawkNotificationService.error('No Remote Hosts Specified: Please add a host');
+                        $location.path('/preferences');
+                    } else {
+                        RedhawkNotificationService.info('No domains found on any of the registered hosts');
+                    }
+                }
+            });
             $scope.user = user;
             $scope.$watch('user.domain', function(domainId){
                 if(!domainId) return;
@@ -194,62 +205,95 @@ angular.module('webSCA', [
                 });
                 $scope.redhawk.configure(data);
             };
+
         }
     ])
-    .controller('Waveforms', ['$scope', 'RedhawkDomain', 'user', function($scope, RedhawkDomain, user) {
-        $scope.user = user;
-        $scope.$watch('user.domain', function(domainId) {
-            $scope.domain = RedhawkDomain.getDomain(domainId);
+    .controller('Waveforms', ['$scope', 'RedhawkDomain', 'user', '$location', 'RedhawkNotificationService',
+        function($scope, RedhawkDomain, user, $location, RedhawkNotificationService) {
+            user.refreshData().then(function() {
+                if (user.domains.length == 0) {
+                    if (user.hosts.length == 0) {
+                        RedhawkNotificationService.error('No Remote Hosts Specified: Please add a host');
+                        $location.path('/preferences');
+                    } else {
+                        RedhawkNotificationService.info('No domains found on any of the registered hosts');
+                    }
+                }
+            });
+            $scope.user = user;
+            $scope.$watch('user.domain', function(domainId) {
+                $scope.domain = RedhawkDomain.getDomain(domainId);
 
-            $scope.waveforms = $scope.domain.getLaunchableWaveforms();
+                $scope.waveforms = $scope.domain.getLaunchableWaveforms();
 
-            $scope.currentWaveform = null;
-        });
+                $scope.currentWaveform = null;
+            });
 
-        $scope.$watch('domain.applications', function(waveforms){
-            if(waveforms && waveforms.length)
-                $scope.setWaveform(waveforms[0].id);
-        });
+            $scope.$watch('domain.applications', function(waveforms){
+                if(waveforms && waveforms.length)
+                    $scope.setWaveform(waveforms[0].id);
+            });
 
-        $scope.setWaveform = function(id) {
-            if(id)
-                $scope.currentWaveform = id;
-            return $scope.currentWaveform;
-        };
+            $scope.setWaveform = function(id) {
+                if(id)
+                    $scope.currentWaveform = id;
+                return $scope.currentWaveform;
+            };
 
-        $scope.launch = function(name) {
-            $scope.domain.launch(name).$promise.then(function(waveform){
-                $scope.domain.$promise.then(function(){
-                    $scope.setWaveform(waveform.id);
-                });
-            })
-        };
-    }])
-    .controller('DeviceManagers', ['$scope', 'RedhawkDomain', 'user', function($scope, RedhawkDomain, user) {
-        $scope.user = user;
-        $scope.$watch('user.domain', function(domainId) {
-            $scope.redhawk = RedhawkDomain.getDomain(domainId);
-        });
+            $scope.launch = function(name) {
+                $scope.domain.launch(name).$promise.then(function(waveform){
+                    $scope.domain.$promise.then(function(){
+                        $scope.setWaveform(waveform.id);
+                    });
+                })
+            };
+        }])
+    .controller('DeviceManagers', ['$scope', 'RedhawkDomain', 'user', '$location', 'RedhawkNotificationService',
+        function($scope, RedhawkDomain, user, $location, RedhawkNotificationService) {
+            user.refreshData().then(function() {
+                if (user.domains.length == 0) {
+                    if (user.hosts.length == 0) {
+                        RedhawkNotificationService.error('No Remote Hosts Specified: Please add a host');
+                        $location.path('/preferences');
+                    } else {
+                        RedhawkNotificationService.info('No domains found on any of the registered hosts');
+                    }
+                }
+            });
+            $scope.user = user;
+            $scope.$watch('user.domain', function(domainId) {
+                $scope.redhawk = RedhawkDomain.getDomain(domainId);
+            });
 
-        $scope.$watch('redhawk.deviceManagers', function(deviceMgrs){
-            if( deviceMgrs && deviceMgrs.length > 0 && deviceMgrs.indexOf($scope.currentManager) == -1) {
-                $scope.setManager(deviceMgrs[0].id);
-            }
-        });
+            $scope.$watch('redhawk.deviceManagers', function(deviceMgrs){
+                if( deviceMgrs && deviceMgrs.length > 0 && deviceMgrs.indexOf($scope.currentManager) == -1) {
+                    $scope.setManager(deviceMgrs[0].id);
+                }
+            });
 
-        $scope.setManager = function(id) {
-            if(!id)
+            $scope.setManager = function(id) {
+                if(!id)
+                    return $scope.currentManager;
+
+                $scope.manager = $scope.redhawk.getDeviceManager(id);
+
+                $scope.currentManager = id;
                 return $scope.currentManager;
+            };
 
-            $scope.manager = $scope.redhawk.getDeviceManager(id);
-
-            $scope.currentManager = id;
-            return $scope.currentManager;
-        };
-
-    }])
-    .controller('Device', ['$scope', '$window', '$filter', '$routeParams', 'RedhawkDomain', 'user',
-        function($scope, $window, $filter, $routeParams, RedhawkDomain, user){
+        }])
+    .controller('Device', ['$scope', '$window', '$filter', '$routeParams', 'RedhawkDomain', 'user', '$location', 'RedhawkNotificationService',
+        function($scope, $window, $filter, $routeParams, RedhawkDomain, user, $location, RedhawkNotificationService){
+            user.refreshData().then(function() {
+                if (user.domains.length == 0) {
+                    if (user.hosts.length == 0) {
+                        RedhawkNotificationService.error('No Remote Hosts Specified: Please add a host');
+                        $location.path('/preferences');
+                    } else {
+                        RedhawkNotificationService.info('No domains found on any of the registered hosts');
+                    }
+                }
+            });
             $scope.user = user;
             $scope.$watch('user.domain', function(domainId) {
                 $scope.device = RedhawkDomain.getDomain(domainId).getDevice($routeParams.deviceId, $routeParams.managerId);
