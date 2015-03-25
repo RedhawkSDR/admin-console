@@ -384,9 +384,6 @@ angular.module('webSCA', [
                         nogrid: true,
                         'cmode': "D2"
                     }));
-                raster.change_settings({
-                    fillStyle: fillStyle
-                });
             };
 
             var overlayRaster = function(overrides) {
@@ -509,9 +506,23 @@ angular.module('webSCA', [
 
                 if (data.byteLength/bpa/ape < defaultSubsize) {
                     defaultSubsize = data.byteLength/bpa/ape;
-                    $scope.plotOverrides.subsize = defaultSubsize;
-                    frameSize = defaultSubsize * bpa * ape;
-                    reloadSri = true;
+                    if (defaultSubsize >= 100) {
+                        if (defaultSubsize % 100 !=0) {
+                            defaultSubsize = Math.floor(defaultSubsize / 100) * 100;
+                        }
+                    } else if (defaultSubsize > 10) {
+                        if (defaultSubsize % 10 !=0) {
+                            defaultSubsize = Math.floor(defaultSubsize / 10) * 10;
+                        }
+                    } else {
+                        console.log('data with subsize < 10 will not be plotted');
+                    }
+
+                    if ($scope.plotOverrides.subsize !== defaultSubsize) {
+                        $scope.plotOverrides.subsize = defaultSubsize;
+                        frameSize = defaultSubsize * bpa * ape;
+                        reloadSri = true;
+                    }
                 }
                 data = data.slice(0, frameSize);
                 var array = dataConverter(data);//NB the return value toggles between two different length values. Thus the data is sometimes not properly formatted
@@ -561,17 +572,31 @@ angular.module('webSCA', [
                 var isDirty = false;
                 angular.forEach(data, function(item, key){
                     if (angular.isDefined($scope.plotOverrides[key]) && !angular.equals($scope.plotOverrides[key], item)) {
-                        isDirty = true;
-                        console.log("Plot settings change "+key+": "+$scope.plotOverrides[key]+" -> "+item);
-                        $scope.plotOverrides[key] = item;
+                        if (!((key === 'ydelta' || key === 'subsize') && item === 0) ) {
+                            isDirty = true;
+                            console.log("Plot settings change " + key + ": " + $scope.plotOverrides[key] + " -> " + item);
+                            $scope.plotOverrides[key] = item;
+                        }
                     }
                 });
 
-                if(data['subsize'] === 0) {
-                    $scope.plotOverrides['subsize'] = defaultSubsize;
-                    $scope.plotOverrides['ydelta'] = $scope.plotOverrides.xdelta * defaultSubsize;
+                if(!data.subsize) {
+                    if ($scope.plotOverrides.subsize !== defaultSubsize) {
+                        $scope.plotOverrides.subsize = defaultSubsize;
+                        $scope.plotOverrides.ydelta = $scope.plotOverrides.xdelta * defaultSubsize;
+                        isDirty = true;
+                    }
 
                 }
+
+                if (!data.ydelta) {
+                    if ($scope.plotOverrides.ydelta && Math.abs($scope.plotOverrides.ydelta - $scope.plotOverrides.xdelta * $scope.plotOverrides.subsize) >
+                            $scope.plotOverrides.ydelta / 10) {
+                        $scope.plotOverrides.ydelta = $scope.plotOverrides.xdelta * $scope.plotOverrides.subsize;
+                        isDirty = true;
+                    }
+                }
+
                 $scope.plotOverrides['type'] = 2000;
                 $scope.plotOverrides['size'] = 1;
 
