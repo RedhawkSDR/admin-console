@@ -25,11 +25,14 @@
 %define bower node_modules/bower/bin/bower
 %define grunt node_modules/grunt-cli/bin/grunt
 
+%define debug_package %{nil}
+
 Prefix:         %{_prefix}
 Name:		redhawk-admin-console
 Version:	2.0.1
 Release:	1%{?dist}
 Summary:	The REDHAWK Web Baseline used for web applications
+BuildArch:      noarch
 
 License:	GPL
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
