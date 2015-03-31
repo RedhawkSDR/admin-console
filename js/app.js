@@ -29,7 +29,8 @@ angular.module('webSCA', [
     'webSCADirectives',
     'redhawkDirectives',
     'ngRoute',
-    'ui.bootstrap'//,
+    'ui.bootstrap',
+    'LocalStorageModule'//,
 //    'hljs'
 ])
     .config(['$routeProvider',
@@ -87,15 +88,25 @@ angular.module('webSCA', [
             return items.slice(0, num);
         };
     })
-    .factory('user', ['RedhawkDomain', 'RedhawkSysinfo',  function(RedhawkDomain, RedhawkSysinfo){
+    .factory('user', ['RedhawkDomain', 'RedhawkSysinfo', 'localStorageService',  function(RedhawkDomain, RedhawkSysinfo, localStorageService){
         var user = {
             domain: undefined,
-            hosts: [ 'localhost'],
+            hosts: undefined,
             domains: [],
             alldomains: [],
             hoststatus: {},
             sysinfo: {}
         };
+
+        user.getStoredHosts = function() {
+            var storedHosts = localStorageService.get('hosts');
+            if (!Array.isArray(storedHosts) || storedHosts.length == 0) {
+                storedHosts = ['localhost'];
+            }
+            return storedHosts;
+        };
+
+        user.hosts = user.getStoredHosts();;
 
         // Update sys info
         RedhawkSysinfo().then(function(data) {
@@ -114,9 +125,24 @@ angular.module('webSCA', [
             return new Promise(function(resolve, reject) {
                 RedhawkDomain.getDomainIds(user.hosts, user.sysinfo.supportsRemoteLocations).then(function(data) {
                     user.setData(data);
+                    user.hosts = user.getStoredHosts();
                     resolve();
                 });
             });
+        };
+        /**
+         * pushes the object onto the array only if the object is not already in
+         * the array. Otherwise does nothing.
+         * @param {Array} array the array
+         * @param {Object} obj the object to be potentially pushed onto the array
+         * @returns {boolean} true if the object was pushed onto the array, false otherwise
+         */
+        user.uniquePush = function(array, obj) {
+            if (array.indexOf(obj) < 0) {
+                array.push(obj);
+                return true;
+            }
+            return false;
         };
 
         // Set the domains list, optionally clearing domain if not in domains list
@@ -155,13 +181,20 @@ angular.module('webSCA', [
 
         return user;
     }])
-    .controller('UserSettings', ['$scope', 'user', '$timeout', 'RedhawkDomain',
-        function($scope, user, $timeout, RedhawkDomain) {
+    .controller('UserSettings', ['$scope', 'user', '$timeout', 'RedhawkDomain', 'localStorageService',
+        function($scope, user, $timeout, RedhawkDomain, localStorageService) {
             $scope.user = user;
+
+            $scope.hosts = user.getStoredHosts();
+
+            /* bind seems to only work with top-level scope objects. So we create a
+            copy of user.hosts below and place it on the scope as hosts. Here we bind to it */
+            localStorageService.bind($scope, 'hosts');
 
             $scope.add_host = function(newhost) {
                 if (newhost) {
-                    $scope.user.hosts.push(newhost);
+                    user.uniquePush($scope.user.hosts, newhost);
+                    $scope.hosts = angular.copy($scope.user.hosts);
                     $scope.newhost = '';
                     $scope.user.refreshData();
                 };
@@ -169,6 +202,7 @@ angular.module('webSCA', [
 
             $scope.remove_host = function(index) {
                 $scope.user.hosts.splice(index, 1);
+                $scope.hosts = angular.copy($scope.user.hosts);
                 $scope.user.refreshData();
             };
 
