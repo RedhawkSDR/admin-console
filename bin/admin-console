@@ -71,5 +71,5 @@ if [ -d "$topdir/html" ] ; then
 fi
 
 # Execute the REDHAWK Python REST server serving up the admin console 
-(sleep 1 && gnome-open http://localhost:$port/)
+(sleep 3 && python -c "import webbrowser; webbrowser.open('http://localhost:$port/')" >/dev/null 2>&1 ) 
 "$pythonprog"  "$pyrest" --staticpath="$htmldir" ${debug:+--logging=debug} ${port:+--port=$port}
