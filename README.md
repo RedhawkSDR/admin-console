@@ -13,24 +13,40 @@ REDHAWK Website: [www.redhawksdr.org](http://www.redhawksdr.org)
 This work is protected by Copyright. Please refer to the [Copyright File](src/COPYRIGHT) for updated copyright information.
 
 ## License
-
 The REDHAWK Web Admin Console is licensed under the GNU Lesser General Public License (LGPL).
 
 ## Running
+The REDHAWK Admin Console is a lightweigh web based application that runs on an HTML-5 compliant browser.  Admin Console requires a REDHAWK RESTful backend and web hosting. One such REDHAWK RESTful backend implementation is the [REDHAWk REST Python ](https://git.vsi-corp.com/redhawk-web-ui/rest-python).  The other REDHAWK RESTful back-end is built on top of RedBus.
 
-The REDHAWK Admin Console is a frontend interface and requires a backend REST service to run. It has been built to 
-support the REDHAWK REST Python project and can be used by downloading that project and placing the contents 
-(or symbolic link) of this repository in a directory `apps/admin` of the REST Python project. Follow the steps listed 
-in REST Python to run both parts of the application.
+## Standalone Admin Console
+To install and run the Standalone REDHAWK Web Admin Console from RPMs:
 
-The admin console can then be viewed by going to `http://<location:port>/apps/admin/`.
+    yum install redhawk-admin-console redhawk-rest-python redhawk-rest-doc
+    
+To run the standalone version of admin console:
 
-Dependencies for this project can be downloaded using `npm` with the following commands:
+    /var/redhawk/web/admin-console/bin/admin-console 
+  
+The standalone Admin Console URL is http://localhost:8888/ 
 
+## Building
+
+### Setting up your environment
+You will need Node Package Manager `npm` installed on your system:
+
+    yum install npm
+    
+To install grunt and bower on your system:
+
+    sudo npm install -g grunt-cli
+    sudo npm install -g bower
+
+(Note that grunt and bower can be installed without sudo by skipping the -g option, however without the global (-g) option you need to include the full path to the executable in the node_modules directory (e.g. `path/to/admin-console/node_modules/bower/bin/bower`))
+
+### Building Admin Console
+    cd path/to/admin-console
     npm install
-    node_modules/bower/bin/bower install
-    
-Distribution versions of this project by running:
+    bower install
+    grunt default dist
 
-    node_modules/grunt/bin/grunt dist
-    
+The files are built in the `dist` directory
